@@ -7,11 +7,13 @@
   <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Kalam:wght@400;700&display=swap">
   <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body data-root="../" data-page="tutorial">
 <main class="wrap">
+<div class="board">
+<span class="chalk-stick"></span><span class="chalk-stick y"></span>
 <article class="article">
   <div class="breadcrumb"><a href="index.html">Tutorial</a> › Mekanika Bahan</div>
   <h1>Momen inersia penampang</h1>
@@ -41,6 +43,11 @@
   <h2>4. Contoh soal: penampang T</h2>
   <p>Sayap 300 × 50 mm di atas badan 50 × 250 mm (tinggi total 300 mm). Acuan y diukur dari sisi bawah.</p>
 
+  <svg class="chalk-svg" viewBox="0 0 640 340" role="img" aria-label="Sketsa penampang T dengan titik berat dan garis netral"><defs><filter id="chalk2" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" result="d"/><feComposite in="d" in2="n" operator="out" result="o"/><feComposite in="d" in2="o" operator="arithmetic" k1="0" k2="1" k3="-.25" k4="0"/></filter>
+<marker id="ah2" viewBox="0 0 10 10" refX="5" refY="10" markerWidth="7" markerHeight="7"><path d="M1 1L5 10L9 1" fill="none" stroke="currentColor" stroke-width="1.6"/></marker>
+<marker id="au2" viewBox="0 0 10 10" refX="5" refY="0" markerWidth="7" markerHeight="7"><path d="M1 9L5 0L9 9" fill="none" stroke="currentColor" stroke-width="1.6"/></marker></defs><g filter="url(#chalk2)" font-family="Kalam, cursive"><path class="draw" d="M140.0 50.0H380.0V90.0H280.0V290.0H240.0V90.0H140.0Z" fill="none" stroke="#f4f1e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /><path class="draw" d="M140.0 90.0H380.0" fill="none" stroke="#f4f1e6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 6"/><path class="draw" d="M140.0 32.0H380.0M140.0 24.0v16M380.0 24.0v16" fill="none" stroke="#9fd3f5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /><text class="write" x="260.0" y="24.0" fill="#9fd3f5" font-size="18" text-anchor="middle">300</text><path class="draw" d="M396.0 50.0V90.0" fill="none" stroke="#9fd3f5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /><text class="write" x="404.0" y="76.0" fill="#9fd3f5" font-size="18" text-anchor="start">50</text><path class="draw" d="M218.0 90.0V290.0" fill="none" stroke="#9fd3f5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /><text class="write" x="210.0" y="190.0" fill="#9fd3f5" font-size="18" text-anchor="end">250</text><path class="draw" d="M240.0 308.0H280.0" fill="none" stroke="#9fd3f5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /><text class="write" x="260.0" y="328.0" fill="#9fd3f5" font-size="18" text-anchor="middle">50</text><circle class="write" cx="260.0" cy="70.0" r="4" fill="#f7e27a"/><text class="write" x="250.4" y="76.0" fill="#f7e27a" font-size="17" text-anchor="end">A₁ = 15.000</text><circle class="write" cx="260.0" cy="190.0" r="4" fill="#f7e27a"/><text class="write" x="288.0" y="196.0" fill="#f7e27a" font-size="17" text-anchor="start">A₂ = 12.500</text><path class="draw" d="M92.0 124.55999999999999H460.0" fill="none" stroke="#f59fb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 7"/><text class="write" x="466.0" y="130.56" fill="#f59fb0" font-size="18" text-anchor="start">garis netral</text><path class="draw" d="M108.0 290.0V124.55999999999999M100.0 290.0h20" fill="none" stroke="#f59fb0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /><text class="write" x="101.6" y="210.0" fill="#f59fb0" font-size="19" text-anchor="end">ȳ = 206,8</text><path class="draw" d="M92.0 290.0H428.0" fill="none" stroke="#f4f1e6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 6"/><text class="write" x="434.0" y="295.0" fill="#f4f1e6" font-size="15" text-anchor="start">acuan (y = 0)</text></g></svg>
+  <p class="chalk-cap">Bagi penampang menjadi sayap (A₁) dan badan (A₂), lalu cari garis netralnya.</p>
+
   <h3>Langkah 1: Titik berat</h3>
   <div class="table-wrap"><table>
     <tr><th>Bagian</th><th class="num">A (mm²)</th><th class="num">y (mm)</th><th class="num">A·y (mm³)</th></tr>
@@ -69,7 +76,9 @@ Ix = 3.125.000 + 69.731.405 + 65.104.167 + 83.677.686
     <a class="btn secondary" href="balok-sederhana.html">Tutorial sebelumnya</a>
   </div>
 </article>
+</div>
 </main>
 <script src="../assets/layout.js"></script>
+<script src="../assets/board.js"></script>
 </body>
 </html>

@@ -20,7 +20,7 @@
   --radius: 14px;
   --maxw: 1140px;
   --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-display: "Kalam", "Patrick Hand", cursive;
   --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
   color-scheme: light;
 }
@@ -52,7 +52,7 @@ body {
 }
 a { color: var(--accent); text-underline-offset: 3px; }
 img, svg { max-width: 100%; }
-h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; letter-spacing: -.02em; margin: 1.6em 0 .5em; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; letter-spacing: 0; font-weight: 700; margin: 1.6em 0 .5em; }
 h1 { font-size: clamp(2rem, 4.6vw, 3rem); margin-top: .3em; }
 h2 { font-size: clamp(1.35rem, 2.6vw, 1.7rem); }
 h3 { font-size: 1.12rem; letter-spacing: -.01em; }
@@ -70,7 +70,7 @@ code, .mono { font-family: var(--font-mono); font-size: .9em; }
   border-bottom: 1px solid var(--border);
 }
 .site-header .wrap { display: flex; align-items: center; gap: 12px; min-height: 64px; }
-.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.12rem; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 10px; letter-spacing: -.02em; }
+.brand { font-family: var(--font); font-weight: 700; font-size: 1.12rem; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 10px; letter-spacing: -.02em; }
 .brand-mark { width: 32px; height: 32px; display: block; border-radius: 9px; box-shadow: 0 0 0 1px var(--border); }
 .brand-accent { font-weight: 400; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .site-nav { display: flex; gap: 2px; margin-left: auto; }
@@ -113,7 +113,7 @@ main { padding: 28px 0 72px; }
 
 .stats-row { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 28px; }
 .stats-row div { font-size: .88rem; color: var(--muted); }
-.stats-row b { display: block; font-family: var(--font-display); font-size: 1.5rem; color: var(--text); letter-spacing: -.02em; }
+.stats-row b { display: block; font-family: var(--font); font-size: 1.5rem; color: var(--text); letter-spacing: -.02em; }
 
 /* ---------- buttons ---------- */
 .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 10px; background: var(--text); color: var(--bg); text-decoration: none; font-weight: 600; border: 0; cursor: pointer; font: 600 .98rem var(--font); transition: transform .15s, box-shadow .15s; }
@@ -206,7 +206,7 @@ input[type=number] { font-family: var(--font-mono); font-size: .9rem; }
 .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; position: relative; overflow: hidden; }
 .stat::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--grad); opacity: .8; }
 .stat .k { font-size: .78rem; color: var(--muted); font-weight: 500; }
-.stat .v { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.stat .v { font-family: var(--font); font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
 .stat .u { font-family: var(--font); font-size: .78rem; color: var(--muted); font-weight: 500; }
 .diagram { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 12px 8px; margin-bottom: 14px; }
 .diagram h3 { margin: 2px 6px 6px; font-size: .95rem; }
@@ -215,3 +215,70 @@ input[type=number] { font-family: var(--font-mono); font-size: .9rem; }
 .error { color: var(--red); font-size: .9rem; }
 .muted { color: var(--muted); }
 .hint { font-size: .84rem; color: var(--muted); margin: 10px 0 0; }
+
+/* =========================================================
+   Papan tulis (tutorial)
+   ========================================================= */
+.board {
+  --chalk: #f2efe4; --chalk-dim: #c9cfc4; --chalk-y: #f7e27a; --chalk-p: #f59fb0; --chalk-b: #9fd3f5;
+  position: relative; margin: 8px auto 0; max-width: 980px;
+  padding: clamp(22px, 5vw, 56px) clamp(18px, 5vw, 64px) clamp(36px, 6vw, 64px);
+  color: var(--chalk); font-family: "Kalam", "Patrick Hand", cursive; font-size: 1.16rem; line-height: 1.7;
+  background-color: #253a2f;
+  background-image:
+    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,.07), transparent 45%),
+    radial-gradient(ellipse at 80% 70%, rgba(255,255,255,.05), transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(0,0,0,.25), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  border: clamp(10px, 1.6vw, 16px) solid #7a5232;
+  border-image: linear-gradient(135deg, #8a5d39, #6a4428 40%, #93653f 60%, #5e3b22) 1;
+  box-shadow: inset 0 0 60px rgba(0,0,0,.45), 0 18px 40px rgba(0,0,0,.25);
+  text-shadow: 0 0 1px rgba(242,239,228,.55);
+}
+.board::after { /* baki kapur */
+  content: ""; position: absolute; left: 6%; right: 6%; bottom: -26px; height: 12px; border-radius: 0 0 6px 6px;
+  background: linear-gradient(#8a5d39, #5e3b22); box-shadow: 0 6px 10px rgba(0,0,0,.25);
+}
+.chalk-stick { position: absolute; bottom: -22px; right: 14%; width: 46px; height: 9px; border-radius: 3px; background: #f4f1e6; transform: rotate(-4deg); z-index: 1; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.chalk-stick.y { right: calc(14% + 60px); width: 30px; background: #f7e27a; transform: rotate(6deg); }
+.board .article { max-width: none; }
+.board .article > p, .board .article li { font-size: 1.16rem; color: var(--chalk); }
+.board h1, .board h2, .board h3 { font-family: "Cabin Sketch", "Kalam", cursive; color: var(--chalk); letter-spacing: 0; font-weight: 700; }
+.board h1 { font-size: clamp(2.1rem, 5vw, 3.2rem); margin: .2em 0 .3em; }
+.board h2 { font-size: clamp(1.6rem, 3.4vw, 2.1rem); margin-top: 1.8em; }
+.board h2::before { display: none; }
+.board h2 { display: inline-block; padding-bottom: 2px; background: linear-gradient(var(--chalk-y), var(--chalk-y)) left bottom / 100% 3px no-repeat; }
+.board h3 { font-size: 1.45rem; color: var(--chalk-b); }
+.board strong { color: var(--chalk-y); font-weight: 700; }
+.board em { color: var(--chalk-p); font-style: normal; }
+.board a { color: var(--chalk-b); }
+.board .breadcrumb, .board .breadcrumb a { color: var(--chalk-dim); font-family: "Kalam", cursive; }
+.board .tag { background: transparent; border: 1.5px dashed var(--chalk-dim); color: var(--chalk-dim); font-family: "Kalam", cursive; font-size: .9rem; font-weight: 400; }
+.board .tag.c { border-color: var(--chalk-b); color: var(--chalk-b); }
+.board .formula {
+  background: transparent; border: 0; border-left: 3px solid var(--chalk-y); border-radius: 0;
+  font-family: "Kalam", cursive; font-size: 1.22rem; color: var(--chalk-y); line-height: 1.6; padding: 4px 0 4px 18px;
+}
+.board .note { background: rgba(255,255,255,.04); border: 2px dashed var(--chalk-p); border-radius: 14px 4px 14px 4px; color: var(--chalk); }
+.board .note strong { color: var(--chalk-p); }
+.board .table-wrap { background: transparent; border: 0; }
+.board table { font-size: 1.08rem; }
+.board th, .board td { border-bottom: 1.5px solid rgba(242,239,228,.35); font-family: "Kalam", cursive; }
+.board th { background: transparent; color: var(--chalk-b); font-size: 1.05rem; }
+.board td.num, .board th.num { font-family: "Kalam", cursive; font-size: 1.08rem; }
+.board sub { font-size: .7em; }
+.chalk-svg { display: block; width: 100%; height: auto; margin: 18px 0 8px; overflow: visible; }
+.chalk-cap { text-align: center; color: var(--chalk-dim); font-size: 1rem; margin: 0 0 18px; }
+.board .btn { font-family: "Kalam", cursive; font-size: 1.05rem; }
+.board .btn.primary { background: var(--chalk); color: #253a2f; box-shadow: none; }
+.board .btn.secondary { background: transparent; color: var(--chalk); box-shadow: inset 0 0 0 2px var(--chalk-dim); }
+@media (max-width: 600px) { .board { font-size: 1.08rem; } .board .formula { font-size: 1.08rem; } }
+
+/* animasi "ditulis" */
+.js-board .reveal { opacity: 0; transform: translateY(8px); transition: opacity .7s ease, transform .7s ease; }
+.js-board .reveal.on { opacity: 1; transform: none; }
+.js-board .chalk-svg .write { opacity: 0; transition: opacity .5s ease; }
+.js-board .chalk-svg.on .write { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .js-board .reveal, .js-board .chalk-svg .write { opacity: 1 !important; transform: none !important; transition: none; }
+}
