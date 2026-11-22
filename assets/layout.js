@@ -26,7 +26,7 @@
     '<div><a class="brand" href="' + root + 'index.html"><img class="brand-mark" src="' + root + 'assets/logo.svg" alt="" width="28" height="28">' +
     '<span>Sipil<span class="brand-accent">Belajar</span></span></a>' +
     '<p style="max-width:340px;margin:10px 0 0">Tutorial dan kalkulator struktur untuk mahasiswa teknik sipil. Gratis, dan semua hitungan berjalan di browser Anda.</p></div>' +
-    '<div><h4>Kalkulator</h4><ul><li><a href="' + root + 'kalkulator/balok.html">Balok</a></li><li><a href="' + root + 'kalkulator/penampang.html">Properti penampang</a></li></ul></div>' +
+    '<div><h4>Kalkulator</h4><ul><li><a href="' + root + 'kalkulator/balok.html">Balok</a></li><li><a href="' + root + 'kalkulator/statika.html">Statika (menerus, miring, portal)</a></li><li><a href="' + root + 'kalkulator/penampang.html">Properti penampang</a></li></ul></div>' +
     '<div><h4>Tutorial</h4><ul><li><a href="' + root + 'tutorial/balok-sederhana.html">Gaya dalam balok</a></li><li><a href="' + root + 'tutorial/momen-inersia.html">Momen inersia</a></li></ul></div>' +
     '</div><div class="footer-note">© ' + new Date().getFullYear() + ' ' + SITE +
     ' · Untuk belajar. Selalu periksa ulang hasil perhitungan sebelum dipakai untuk desain nyata.</div></div>';

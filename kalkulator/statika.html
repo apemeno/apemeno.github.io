@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kalkulator Statika · SipilBelajar</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Kalam:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-root="../" data-page="kalkulator">
+<main class="wrap">
+  <header class="page-head">
+    <div class="breadcrumb"><a href="index.html">Kalkulator</a> › Statika</div>
+    <h1>Kalkulator statika</h1>
+    <p>Pilih kasus, isi data, lalu lihat reaksi tumpuan serta diagram gaya normal (N), gaya geser (V), dan momen (M) langsung di gambar struktur. Untuk balok tunggal dengan lendutan, pakai <a href="balok.html">kalkulator balok</a>.</p>
+  </header>
+
+  <div class="case-tabs" role="tablist" id="tabs">
+    <button role="tab" data-case="menerus" aria-selected="true">Balok menerus</button>
+    <button role="tab" data-case="miring" aria-selected="false">Balok miring</button>
+    <button role="tab" data-case="portal" aria-selected="false">Portal</button>
+  </div>
+
+  <div class="calc">
+    <form id="form" autocomplete="off" onsubmit="return false"></form>
+    <section aria-live="polite">
+      <div class="results" id="results"></div>
+      <div class="diagram"><h3>Struktur, beban &amp; reaksi</h3><div id="d-struct"></div></div>
+      <div class="diagram"><h3>Momen lentur M (kN·m) <span class="muted" style="font-weight:400;font-size:.82rem">digambar di sisi serat tarik</span></h3><div id="d-M"></div></div>
+      <div class="diagram"><h3>Gaya geser V (kN)</h3><div id="d-V"></div></div>
+      <div class="diagram" id="wrap-N"><h3>Gaya normal N (kN) <span class="muted" style="font-weight:400;font-size:.82rem">+ tarik, − tekan</span></h3><div id="d-N"></div></div>
+      <h3>Reaksi tumpuan</h3>
+      <div class="table-wrap"><table id="t-react"></table></div>
+      <h3>Ringkasan per batang</h3>
+      <div class="table-wrap"><table id="t-member"></table></div>
+      <p class="hint" id="note"></p>
+    </section>
+  </div>
+</main>
+<script src="../assets/layout.js"></script>
+<script src="../assets/plot.js"></script>
+<script src="../assets/frame.js"></script>
+<script src="../assets/statika-cases.js"></script>
+<script src="../assets/statika.js"></script>
+</body>
+</html>
