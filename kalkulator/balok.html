@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kalkulator Balok · SipilBelajar</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-root="../" data-page="kalkulator">
+<main class="wrap">
+  <div class="breadcrumb"><a href="index.html">Kalkulator</a> › Statika</div>
+  <h1>Kalkulator balok</h1>
+  <p class="muted">Reaksi tumpuan, diagram gaya geser (SFD), momen lentur (BMD), dan lendutan. Beban ke bawah bernilai positif. Momen positif = serat bawah tertarik.</p>
+
+  <div class="calc">
+    <form id="form" autocomplete="off" onsubmit="return false">
+      <fieldset>
+        <legend>Balok</legend>
+        <label for="support">Jenis tumpuan</label>
+        <select id="support">
+          <option value="simple">Sendi–rol (balok sederhana)</option>
+          <option value="cantilever">Kantilever (jepit di kiri)</option>
+        </select>
+        <label for="L">Panjang bentang L (m)</label>
+        <input id="L" type="number" step="any" min="0.1" value="6">
+      </fieldset>
+
+      <fieldset>
+        <legend>Kekakuan (untuk lendutan)</legend>
+        <div class="row">
+          <div><label for="E">E (MPa)</label><input id="E" type="number" step="any" value="200000"></div>
+          <div><label for="I">I (×10⁶ mm⁴)</label><input id="I" type="number" step="any" value="100"></div>
+        </div>
+        <p class="muted" style="font-size:.85rem;margin:8px 0 0">Baja ≈ 200.000 MPa. Beton ≈ 4700√f'c MPa.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Beban</legend>
+        <div id="loads"></div>
+        <div class="btn-row" style="margin:10px 0 0">
+          <button type="button" class="btn small secondary" id="addPoint">+ Beban terpusat</button>
+          <button type="button" class="btn small secondary" id="addUdl">+ Beban merata</button>
+        </div>
+      </fieldset>
+      <div class="error" id="err"></div>
+    </form>
+
+    <section aria-live="polite">
+      <div class="diagram"><h3>Skema balok</h3><div id="schema"></div></div>
+      <div class="results" id="results"></div>
+      <div class="diagram"><h3>Gaya geser V (kN)</h3><div id="sfd"></div></div>
+      <div class="diagram"><h3>Momen lentur M (kN·m)</h3><div id="bmd"></div></div>
+      <div class="diagram"><h3>Lendutan δ (mm)</h3><div id="defl"></div></div>
+      <h3>Nilai di titik penting</h3>
+      <div class="table-wrap"><table id="table"></table></div>
+    </section>
+  </div>
+</main>
+<script src="../assets/layout.js"></script>
+<script src="../assets/plot.js"></script>
+<script src="../assets/beam.js"></script>
+</body>
+</html>

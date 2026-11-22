@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Momen Inersia · SipilBelajar</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-root="../" data-page="tutorial">
+<main class="wrap">
+<article class="article">
+  <div class="breadcrumb"><a href="index.html">Tutorial</a> › Mekanika Bahan</div>
+  <h1>Momen inersia penampang</h1>
+  <p class="muted">Tingkat: dasar · Waktu baca ± 10 menit</p>
+
+  <p>Momen inersia (I) mengukur seberapa jauh luas penampang tersebar dari sumbu netralnya. Semakin besar I, semakin kaku balok terhadap lentur: tegangan lentur dan lendutan menjadi lebih kecil.</p>
+  <div class="formula">σ = M·y / I          δ ∝ 1 / (E·I)</div>
+
+  <h2>1. Titik berat</h2>
+  <p>Untuk penampang gabungan, bagi menjadi bagian sederhana (persegi, lingkaran), lalu:</p>
+  <div class="formula">ȳ = Σ(Aᵢ·yᵢ) / ΣAᵢ</div>
+  <p>dengan yᵢ jarak titik berat bagian ke-i dari sumbu acuan (misalnya sisi bawah).</p>
+
+  <h2>2. Momen inersia bentuk dasar</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Bentuk</th><th>I terhadap sumbu titik beratnya</th></tr>
+    <tr><td>Persegi b × h</td><td>b·h³ / 12</td></tr>
+    <tr><td>Lingkaran diameter D</td><td>π·D⁴ / 64</td></tr>
+    <tr><td>Pipa (D luar, d dalam)</td><td>π·(D⁴ − d⁴) / 64</td></tr>
+  </table></div>
+
+  <h2>3. Teorema sumbu sejajar</h2>
+  <p>Momen inersia sebuah bagian terhadap sumbu netral gabungan:</p>
+  <div class="formula">I = I₀ + A·d²</div>
+  <p>dengan I₀ momen inersia bagian terhadap titik beratnya sendiri, dan d jarak titik berat bagian ke sumbu netral gabungan.</p>
+
+  <h2>4. Contoh soal: penampang T</h2>
+  <p>Sayap 300 × 50 mm di atas badan 50 × 250 mm (tinggi total 300 mm). Acuan y diukur dari sisi bawah.</p>
+
+  <h3>Langkah 1: Titik berat</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Bagian</th><th class="num">A (mm²)</th><th class="num">y (mm)</th><th class="num">A·y (mm³)</th></tr>
+    <tr><td>Sayap</td><td class="num">15.000</td><td class="num">275</td><td class="num">4.125.000</td></tr>
+    <tr><td>Badan</td><td class="num">12.500</td><td class="num">125</td><td class="num">1.562.500</td></tr>
+    <tr><th>Jumlah</th><th class="num">27.500</th><th></th><th class="num">5.687.500</th></tr>
+  </table></div>
+  <div class="formula">ȳ = 5.687.500 / 27.500 = 206,82 mm (dari bawah)</div>
+
+  <h3>Langkah 2: Momen inersia</h3>
+  <div class="formula">Sayap: I₀ = 300·50³/12      =  3.125.000 mm⁴
+       d  = 275 − 206,82      =  68,18 mm
+       A·d² = 15.000·68,18²  = 69.731.405 mm⁴
+
+Badan: I₀ = 50·250³/12      = 65.104.167 mm⁴
+       d  = 206,82 − 125      =  81,82 mm
+       A·d² = 12.500·81,82²  = 83.677.686 mm⁴
+
+Ix = 3.125.000 + 69.731.405 + 65.104.167 + 83.677.686
+   ≈ 221,64 × 10⁶ mm⁴</div>
+
+  <div class="note"><strong>Catatan:</strong> pada penampang tidak simetris, modulus penampang atas dan bawah berbeda: S<sub>atas</sub> = I / (h − ȳ) dan S<sub>bawah</sub> = I / ȳ. Tegangan terbesar terjadi di serat yang paling jauh dari sumbu netral.</div>
+
+  <div class="btn-row">
+    <a class="btn" href="../kalkulator/penampang.html?contoh=1">Cek contoh ini di kalkulator</a>
+    <a class="btn secondary" href="balok-sederhana.html">Tutorial sebelumnya</a>
+  </div>
+</article>
+</main>
+<script src="../assets/layout.js"></script>
+</body>
+</html>

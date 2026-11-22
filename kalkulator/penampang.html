@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Properti Penampang · SipilBelajar</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-root="../" data-page="kalkulator">
+<main class="wrap">
+  <div class="breadcrumb"><a href="index.html">Kalkulator</a> › Mekanika Bahan</div>
+  <h1>Properti penampang</h1>
+  <p class="muted">Luas, titik berat, momen inersia, modulus penampang, dan jari-jari girasi. Semua dimensi dalam mm. Sumbu x horizontal (lentur terhadap sumbu kuat).</p>
+
+  <div class="calc">
+    <form id="form" autocomplete="off" onsubmit="return false">
+      <fieldset>
+        <legend>Bentuk penampang</legend>
+        <select id="shape">
+          <option value="wf">Profil I / WF</option>
+          <option value="rect">Persegi panjang</option>
+          <option value="box">Persegi berongga (box)</option>
+          <option value="circle">Lingkaran pejal</option>
+          <option value="pipe">Pipa</option>
+          <option value="tee">Profil T</option>
+        </select>
+      </fieldset>
+      <fieldset>
+        <legend>Dimensi (mm)</legend>
+        <div id="dims" class="row"></div>
+      </fieldset>
+      <div class="error" id="err"></div>
+      <p class="muted" style="font-size:.85rem">Profil I/WF dihitung tanpa jari-jari peralihan (fillet), jadi nilainya sedikit lebih kecil dari tabel baja.</p>
+    </form>
+
+    <section aria-live="polite">
+      <div class="diagram"><h3>Sketsa</h3><div id="sketch"></div></div>
+      <div class="results" id="results"></div>
+      <h3>Rincian perhitungan</h3>
+      <div class="table-wrap"><table id="table"></table></div>
+    </section>
+  </div>
+</main>
+<script src="../assets/layout.js"></script>
+<script src="../assets/plot.js"></script>
+<script src="../assets/section.js"></script>
+</body>
+</html>

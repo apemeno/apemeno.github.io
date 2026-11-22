@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gaya Dalam Balok · SipilBelajar</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-root="../" data-page="tutorial">
+<main class="wrap">
+<article class="article">
+  <div class="breadcrumb"><a href="index.html">Tutorial</a> › Statika</div>
+  <h1>Gaya dalam pada balok sederhana</h1>
+  <p class="muted">Tingkat: dasar · Waktu baca ± 10 menit</p>
+
+  <p>Balok sederhana (<em>simply supported beam</em>) ditumpu sendi di satu ujung dan rol di ujung lain. Karena hanya ada tiga reaksi yang tidak diketahui, balok ini <strong>statis tertentu</strong>: semua reaksi bisa dicari dengan tiga persamaan keseimbangan.</p>
+
+  <h2>1. Persamaan keseimbangan</h2>
+  <div class="formula">ΣFx = 0     ΣFy = 0     ΣM = 0</div>
+  <p>Untuk beban vertikal saja, reaksi horizontal sendi bernilai nol, sehingga yang dicari hanya R<sub>A</sub> dan R<sub>B</sub>.</p>
+
+  <h2>2. Konvensi tanda</h2>
+  <ul>
+    <li><strong>Gaya geser V</strong> positif bila gaya di kiri potongan mengarah ke atas.</li>
+    <li><strong>Momen M</strong> positif bila balok melendut cekung ke atas (serat bawah tertarik), disebut momen <em>sagging</em>.</li>
+  </ul>
+  <p>Hubungan penting antara beban q, geser V, dan momen M:</p>
+  <div class="formula">dV/dx = −q        dM/dx = V</div>
+  <p>Artinya: momen mencapai nilai maksimum (atau minimum) di titik ketika gaya geser bernilai nol atau berganti tanda.</p>
+
+  <h2>3. Contoh soal</h2>
+  <p>Balok sederhana dengan bentang <strong>L = 6 m</strong> memikul beban terpusat <strong>P = 20 kN</strong> pada jarak <strong>a = 2 m</strong> dari tumpuan A, ditambah beban merata <strong>q = 5 kN/m</strong> sepanjang bentang. Hitung reaksi tumpuan, gaya geser, dan momen maksimum.</p>
+
+  <h3>Langkah 1: Reaksi tumpuan</h3>
+  <p>Ambil momen terhadap B (berlawanan jarum jam positif):</p>
+  <div class="formula">ΣM_B = 0
+R_A·6 − 20·(6 − 2) − (5·6)·3 = 0
+R_A·6 = 80 + 90 = 170
+R_A = 28,33 kN</div>
+  <div class="formula">ΣFy = 0
+R_B = 20 + 5·6 − 28,33 = 21,67 kN</div>
+
+  <h3>Langkah 2: Gaya geser</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Posisi x (m)</th><th class="num">V (kN)</th><th>Keterangan</th></tr>
+    <tr><td>0⁺</td><td class="num">28,33</td><td>= R<sub>A</sub></td></tr>
+    <tr><td>2⁻</td><td class="num">18,33</td><td>28,33 − 5·2</td></tr>
+    <tr><td>2⁺</td><td class="num">−1,67</td><td>turun 20 kN akibat P</td></tr>
+    <tr><td>6⁻</td><td class="num">−21,67</td><td>= −R<sub>B</sub></td></tr>
+  </table></div>
+  <p>Gaya geser berganti tanda di x = 2 m, jadi momen maksimum terjadi di bawah beban terpusat.</p>
+
+  <h3>Langkah 3: Momen maksimum</h3>
+  <div class="formula">M(x=2) = R_A·2 − q·2²/2
+       = 28,33·2 − 5·4/2
+       = 56,67 − 10
+       = 46,67 kN·m</div>
+
+  <div class="note"><strong>Cek cepat dengan superposisi:</strong> M akibat P = P·a·b/L = 20·2·4/6 = 26,67 kN·m. M akibat q di x = 2 m = q·x·(L−x)/2 = 5·2·4/2 = 20 kN·m. Total 46,67 kN·m. Cocok.</div>
+
+  <h2>4. Rumus praktis</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Kasus</th><th>Reaksi</th><th>M maks</th><th>Lendutan maks</th></tr>
+    <tr><td>P di tengah bentang</td><td>P/2</td><td>P·L/4</td><td>P·L³ / (48·EI)</td></tr>
+    <tr><td>q merata penuh</td><td>q·L/2</td><td>q·L²/8</td><td>5·q·L⁴ / (384·EI)</td></tr>
+    <tr><td>Kantilever, P di ujung</td><td>P</td><td>−P·L (di jepit)</td><td>P·L³ / (3·EI)</td></tr>
+    <tr><td>Kantilever, q merata</td><td>q·L</td><td>−q·L²/2 (di jepit)</td><td>q·L⁴ / (8·EI)</td></tr>
+  </table></div>
+
+  <div class="btn-row">
+    <a class="btn" href="../kalkulator/balok.html?contoh=1">Cek contoh ini di kalkulator</a>
+    <a class="btn secondary" href="momen-inersia.html">Tutorial berikutnya: momen inersia</a>
+  </div>
+</article>
+</main>
+<script src="../assets/layout.js"></script>
+</body>
+</html>
