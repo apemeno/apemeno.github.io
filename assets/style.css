@@ -298,3 +298,11 @@ input[type=number] { font-family: var(--font-mono); font-size: .9rem; }
 .anim-range input { flex: 1; padding: 0; border: 0; background: none; accent-color: #f7e27a; box-shadow: none; }
 .anim-info { font-size: 1.05rem; color: var(--chalk, #f2efe4); margin: 8px 0 6px; }
 .anim-title { font-family: "Cabin Sketch", cursive; color: var(--chalk-y, #f7e27a); font-size: 1.3rem; margin: 0 0 4px; }
+
+/* rumus (KaTeX) di papan tulis */
+.board .formula { white-space: normal; overflow-x: auto; overflow-y: hidden; padding: 2px 0 2px 18px; }
+.board .formula .katex-display { margin: .5em 0; text-align: left; }
+.board .formula .katex-display > .katex { text-align: left; }
+.board .katex { color: var(--chalk-y); font-size: 1.12em; text-shadow: 0 0 1px rgba(247,226,122,.5); }
+.board td .katex, .board .note .katex, .board p .katex { color: var(--chalk); font-size: 1.05em; }
+.board .katex .mord.text { color: var(--chalk-dim); }

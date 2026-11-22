@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Kalam:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <script defer src="../assets/katex/katex.min.js"></script>
+  <script defer src="../assets/katex/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
   <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body data-root="../" data-page="tutorial">
@@ -20,24 +23,24 @@
   <div class="meta"><span class="tag">Tingkat dasar</span><span class="tag c">± 10 menit</span></div>
 
   <p>Momen inersia (I) mengukur seberapa jauh luas penampang tersebar dari sumbu netralnya. Semakin besar I, semakin kaku balok terhadap lentur: tegangan lentur dan lendutan menjadi lebih kecil.</p>
-  <div class="formula">σ = M·y / I          δ ∝ 1 / (E·I)</div>
+  <div class="formula">$$\sigma = \frac{M\,y}{I} \qquad\qquad \delta \propto \frac{1}{E\,I}$$</div>
 
   <h2>1. Titik berat</h2>
   <p>Untuk penampang gabungan, bagi menjadi bagian sederhana (persegi, lingkaran), lalu:</p>
-  <div class="formula">ȳ = Σ(Aᵢ·yᵢ) / ΣAᵢ</div>
+  <div class="formula">$$\bar{y} = \frac{\sum A_i\, y_i}{\sum A_i}$$</div>
   <p>dengan yᵢ jarak titik berat bagian ke-i dari sumbu acuan (misalnya sisi bawah).</p>
 
   <h2>2. Momen inersia bentuk dasar</h2>
   <div class="table-wrap"><table>
     <tr><th>Bentuk</th><th>I terhadap sumbu titik beratnya</th></tr>
-    <tr><td>Persegi b × h</td><td>b·h³ / 12</td></tr>
-    <tr><td>Lingkaran diameter D</td><td>π·D⁴ / 64</td></tr>
-    <tr><td>Pipa (D luar, d dalam)</td><td>π·(D⁴ − d⁴) / 64</td></tr>
+    <tr><td>Persegi b × h</td><td>\(\dfrac{b\,h^3}{12}\)</td></tr>
+    <tr><td>Lingkaran diameter D</td><td>\(\dfrac{\pi D^4}{64}\)</td></tr>
+    <tr><td>Pipa (D luar, d dalam)</td><td>\(\dfrac{\pi\,(D^4 - d^4)}{64}\)</td></tr>
   </table></div>
 
   <h2>3. Teorema sumbu sejajar</h2>
   <p>Momen inersia sebuah bagian terhadap sumbu netral gabungan:</p>
-  <div class="formula">I = I₀ + A·d²</div>
+  <div class="formula">$$I = I_0 + A\,d^2$$</div>
   <p>dengan I₀ momen inersia bagian terhadap titik beratnya sendiri, dan d jarak titik berat bagian ke sumbu netral gabungan.</p>
 
   <div class="anim-box" data-anim="parallel-axis"><p class="anim-title">Coba lihat: geser persegi menjauhi sumbu</p></div>
@@ -52,19 +55,10 @@
     <tr><td>Badan</td><td class="num">12.500</td><td class="num">125</td><td class="num">1.562.500</td></tr>
     <tr><th>Jumlah</th><th class="num">27.500</th><th></th><th class="num">5.687.500</th></tr>
   </table></div>
-  <div class="formula">ȳ = 5.687.500 / 27.500 = 206,82 mm (dari bawah)</div>
+  <div class="formula">$$\bar{y} = \frac{5.687.500}{27.500} = 206{,}82 \text{ mm (dari bawah)}$$</div>
 
   <h3>Langkah 2: Momen inersia</h3>
-  <div class="formula">Sayap: I₀ = 300·50³/12      =  3.125.000 mm⁴
-       d  = 275 − 206,82      =  68,18 mm
-       A·d² = 15.000·68,18²  = 69.731.405 mm⁴
-
-Badan: I₀ = 50·250³/12      = 65.104.167 mm⁴
-       d  = 206,82 − 125      =  81,82 mm
-       A·d² = 12.500·81,82²  = 83.677.686 mm⁴
-
-Ix = 3.125.000 + 69.731.405 + 65.104.167 + 83.677.686
-   ≈ 221,64 × 10⁶ mm⁴</div>
+  <div class="formula">$$\begin{aligned} \textbf{Sayap: } I_0 &amp;= \frac{300 \cdot 50^3}{12} = 3.125.000 \text{ mm}^4 \\ d &amp;= 275 - 206{,}82 = 68{,}18 \text{ mm} \\ A\,d^2 &amp;= 15.000 \cdot 68{,}18^2 = 69.731.405 \text{ mm}^4 \\[6pt] \textbf{Badan: } I_0 &amp;= \frac{50 \cdot 250^3}{12} = 65.104.167 \text{ mm}^4 \\ d &amp;= 206{,}82 - 125 = 81{,}82 \text{ mm} \\ A\,d^2 &amp;= 12.500 \cdot 81{,}82^2 = 83.677.686 \text{ mm}^4 \\[6pt] I_x &amp;= \sum I_0 + \sum A\,d^2 \\ &amp;= 3.125.000 + 69.731.405 + 65.104.167 + 83.677.686 \\ &amp;\approx 221{,}64 \times 10^6 \text{ mm}^4 \end{aligned}$$</div>
 
   <h3>Langkah 3: Gambar penampangnya</h3>
   <p>Sekarang gambarkan hasil hitungan: letak titik berat tiap bagian (A₁ dan A₂) dan garis netral di ȳ = 206,8 mm dari bawah.</p>
@@ -73,7 +67,7 @@ Ix = 3.125.000 + 69.731.405 + 65.104.167 + 83.677.686
 <marker id="au2" viewBox="0 0 10 10" refX="5" refY="0" markerWidth="7" markerHeight="7"><path d="M1 9L5 0L9 9" fill="none" stroke="currentColor" stroke-width="1.6"/></marker></defs><g filter="url(#chalk2)" font-family="Kalam, cursive"><path class="draw" d="M140.0 50.0H380.0V90.0H280.0V290.0H240.0V90.0H140.0Z" fill="none" stroke="#f4f1e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /><path class="draw" d="M140.0 90.0H380.0" fill="none" stroke="#f4f1e6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 6"/><path class="draw" d="M140.0 32.0H380.0M140.0 24.0v16M380.0 24.0v16" fill="none" stroke="#9fd3f5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /><text class="write" x="260.0" y="24.0" fill="#9fd3f5" font-size="18" text-anchor="middle">300</text><path class="draw" d="M396.0 50.0V90.0" fill="none" stroke="#9fd3f5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /><text class="write" x="404.0" y="76.0" fill="#9fd3f5" font-size="18" text-anchor="start">50</text><path class="draw" d="M218.0 90.0V290.0" fill="none" stroke="#9fd3f5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /><text class="write" x="210.0" y="190.0" fill="#9fd3f5" font-size="18" text-anchor="end">250</text><path class="draw" d="M240.0 308.0H280.0" fill="none" stroke="#9fd3f5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /><text class="write" x="260.0" y="328.0" fill="#9fd3f5" font-size="18" text-anchor="middle">50</text><circle class="write" cx="260.0" cy="70.0" r="4" fill="#f7e27a"/><text class="write" x="250.4" y="76.0" fill="#f7e27a" font-size="17" text-anchor="end">A₁ = 15.000</text><circle class="write" cx="260.0" cy="190.0" r="4" fill="#f7e27a"/><text class="write" x="288.0" y="196.0" fill="#f7e27a" font-size="17" text-anchor="start">A₂ = 12.500</text><path class="draw" d="M92.0 124.55999999999999H460.0" fill="none" stroke="#f59fb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 7"/><text class="write" x="466.0" y="130.56" fill="#f59fb0" font-size="18" text-anchor="start">garis netral</text><path class="draw" d="M108.0 290.0V124.55999999999999M100.0 290.0h20" fill="none" stroke="#f59fb0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /><text class="write" x="101.6" y="210.0" fill="#f59fb0" font-size="19" text-anchor="end">ȳ = 206,8</text><path class="draw" d="M92.0 290.0H428.0" fill="none" stroke="#f4f1e6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 6"/><text class="write" x="434.0" y="295.0" fill="#f4f1e6" font-size="15" text-anchor="start">acuan (y = 0)</text></g></svg>
   <p class="chalk-cap">Garis netral lebih dekat ke sayap karena luas sayap (15.000 mm²) lebih besar dari luas badan (12.500 mm²).</p>
 
-  <div class="note"><strong>Catatan:</strong> pada penampang tidak simetris, modulus penampang atas dan bawah berbeda: S<sub>atas</sub> = I / (h − ȳ) dan S<sub>bawah</sub> = I / ȳ. Tegangan terbesar terjadi di serat yang paling jauh dari sumbu netral.</div>
+  <div class="note"><strong>Catatan:</strong> pada penampang tidak simetris, modulus penampang atas dan bawah berbeda: \(S_{atas} = \dfrac{I}{h - \bar{y}}\) dan \(S_{bawah} = \dfrac{I}{\bar{y}}\). Tegangan terbesar terjadi di serat yang paling jauh dari sumbu netral.</div>
 
   <div class="btn-row">
     <a class="btn primary" href="../kalkulator/penampang.html?contoh=1">Cek contoh ini di kalkulator</a>
