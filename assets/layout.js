@@ -25,17 +25,18 @@
       ['Statika: balok miring', 'kalkulator/statika.html#miring'],
       ['Statika: portal', 'kalkulator/statika.html#portal'],
       ['Properti penampang', 'kalkulator/penampang.html']] },
-    { id: 'peraturan', t: 'Peraturan', u: 'peraturan.html' }
+    { id: 'peraturan', t: 'Peraturan', u: 'peraturan.html' },
+    { id: 'berlangganan', t: '★ Premium', u: 'berlangganan.html', cls: 'pro' }
   ];
   var SEARCH = [];
   MENU.forEach(function (m) { SEARCH.push([m.t, m.u]); (m.sub || []).forEach(function (s) { SEARCH.push(s); }); });
-  SEARCH.push(['Reaksi tumpuan, SFD, BMD', 'tutorial/balok-sederhana.html'], ['Teorema sumbu sejajar', 'tutorial/momen-inersia.html'],
+  SEARCH.push(['Berlangganan Premium, harga paket', 'berlangganan.html'], ['Reaksi tumpuan, SFD, BMD', 'tutorial/balok-sederhana.html'], ['Teorema sumbu sejajar', 'tutorial/momen-inersia.html'],
     ['Cek kontrol keseimbangan statika', 'kalkulator/statika.html'], ['Lendutan balok', 'kalkulator/balok.html'],
     ['Profil WF / I, pipa, T', 'kalkulator/penampang.html'], ['SNI beton, baja, gempa, pembebanan', 'peraturan.html']);
 
   var caret = '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
   var items = MENU.map(function (m) {
-    var cur = m.id === page ? ' class="current"' : '';
+    var cur = ' class="' + (m.id === page ? 'current ' : '') + (m.cls || '') + '"';
     if (!m.sub) return '<li' + cur + '><a href="' + R(m.u) + '">' + m.t + '</a></li>';
     return '<li class="has-sub' + (m.id === page ? ' current' : '') + '"><a href="' + R(m.u) + '">' + m.t + '</a>' +
       '<button class="sub-toggle" aria-expanded="false" aria-label="Buka submenu ' + m.t + '">' + caret + '</button>' +
