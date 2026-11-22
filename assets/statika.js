@@ -325,6 +325,8 @@
           '</td><td class="num">' + fmt(vm, 2) + '</td><td class="num">' + fmt(nm, 2) + '</td></tr>';
       }).join('');
 
+    $('check').innerHTML = equilibrium(b.model, res);
+
     var notes = {
       menerus: 'Dihitung dengan metode kekakuan (setara metode Cross / tiga momen). Momen negatif di atas tumpuan tengah menandakan serat atas tertarik.',
       miring: 'Gaya normal muncul karena beban vertikal tidak tegak lurus batang. Komponen tegak lurus menghasilkan geser dan momen.',
@@ -332,6 +334,68 @@
     };
     $('note').textContent = notes[current];
   }
+
+  // ---------- cek kontrol keseimbangan ----------
+  function tex(t) { try { return katex.renderToString(t, { throwOnError: false, displayMode: true }); } catch (e) { return '<code>' + t + '</code>'; } }
+  function n2(v) { if (Math.abs(v) < 5e-7) v = 0; return fmt(v, 2).replace(',', '{,}').replace(/\./g, '.\\!'); }
+  function equilibrium(model, res) {
+    var A = model.nodes[0], loads = [], FV = 0, FH = 0, MA = 0;
+    var nodeName = function (k) { return current === 'portal' ? ({ 0: 'A', 3: 'D' })[k] : String.fromCharCode(65 + k); };
+    model.members.forEach(function (m, k) {
+      var ni = model.nodes[m.i], nj = model.nodes[m.j], L = Math.hypot(nj.x - ni.x, nj.y - ni.y);
+      var tag = current === 'menerus' ? '_{' + (k + 1) + '}' : '';
+      (m.loads || []).forEach(function (l) {
+        var fx, fy, t, px, py, term;
+        if (l.type === 'udl') {
+          var a = l.a != null ? l.a : 0, b = l.b != null ? l.b : L, len = b - a;
+          fx = (l.qx || 0) * len; fy = (l.qy || 0) * len; t = (a + b) / 2 / L;
+          if (current === 'miring' && state.miring.qMode === 'horizontal') term = { s: 'q \\cdot L_x', n: n2(state.miring.q) + ' \\cdot ' + n2(nj.x - ni.x) };
+          else term = { s: 'q' + tag + ' \\cdot L' + tag, n: n2(-(l.qy || 0)) + ' \\cdot ' + n2(len) };
+        } else { fx = l.px || 0; fy = l.py || 0; t = l.a / L; term = { s: 'P' + tag, n: n2(-fy) }; }
+        px = ni.x + (nj.x - ni.x) * t; py = ni.y + (nj.y - ni.y) * t;
+        FV += fy; FH += fx; MA += (px - A.x) * fy - (py - A.y) * fx;
+        if (fy) loads.push(term);
+      });
+    });
+    var nodalH = [];
+    (model.nodalLoads || []).forEach(function (l) {
+      var n = model.nodes[l.node];
+      FH += l.fx || 0; FV += l.fy || 0; MA += (n.x - A.x) * (l.fy || 0) - (n.y - A.y) * (l.fx || 0) + (l.m || 0);
+      if (l.fx) nodalH.push(n2(l.fx));
+    });
+    var RV = 0, RH = 0, RM = 0, rv = [], rh = [], rm = [], rvn = [], rhn = [];
+    res.reactions.forEach(function (r) {
+      var n = model.nodes[r.node], nm = nodeName(r.node);
+      var sp = model.supports.filter(function (s) { return s.node === r.node; })[0];
+      RV += r.ry; RH += r.rx; RM += r.m + (n.x - A.x) * r.ry - (n.y - A.y) * r.rx;
+      if (sp.uy) { rv.push('V_{' + nm + '}'); rvn.push(r.ry < 0 ? '(' + n2(r.ry) + ')' : n2(r.ry)); }
+      if (sp.ux) { rh.push('H_{' + nm + '}'); rhn.push(r.rx < 0 ? '(' + n2(r.rx) + ')' : n2(r.rx)); }
+      var mt = [];
+      if (sp.rz) mt.push('M_{' + nm + '}');
+      if (sp.uy && Math.abs(n.x - A.x) > 1e-9) mt.push('V_{' + nm + '} \\cdot ' + n2(n.x - A.x));
+      if (sp.ux && Math.abs(n.y - A.y) > 1e-9) mt.push('- H_{' + nm + '} \\cdot ' + n2(n.y - A.y));
+      rm = rm.concat(mt);
+    });
+    var tol = 1e-6 * Math.max(1, Math.abs(FV), Math.abs(FH), Math.abs(MA));
+    var ok = function (d) { return Math.abs(d) <= Math.max(tol, 0.005); };
+    var badge = function (d) { return ok(d) ? '<span class="ok">✓ OK, seimbang</span>' : '<span class="no">✗ Tidak seimbang (selisih ' + fmt(d, 3) + ')</span>'; };
+    var rows = [];
+    rows.push({ t: 'Gaya vertikal: ΣV = 0',
+      eq: '\\begin{aligned} \\textstyle\\sum \\text{aksi}_V &= ' + (loads.length ? loads.map(function (q) { return q.s; }).join(' + ') + ' \\\\ &= ' + loads.map(function (q) { return q.n; }).join(' + ') : '0') + ' \\\\ &= ' + n2(-FV) + '\\ \\text{kN} \\downarrow \\\\ \\textstyle\\sum \\text{reaksi}_V &= ' + rv.join(' + ') + (rv.length > 1 ? ' = ' + rvn.join(' + ') : '') + ' = ' + n2(RV) + '\\ \\text{kN} \\uparrow \\end{aligned}',
+      d: RV + FV });
+    rows.push({ t: 'Gaya horizontal: ΣH = 0',
+      eq: '\\begin{aligned} \\textstyle\\sum \\text{aksi}_H &= ' + n2(FH) + '\\ \\text{kN} \\\\ \\textstyle\\sum \\text{reaksi}_H &= ' + (rh.length ? rh.join(' + ') + ' = ' + (rh.length > 1 ? rhn.join(' + ') + ' = ' : '') : '') + n2(RH) + '\\ \\text{kN} \\\\ \\textstyle\\sum H &= ' + n2(FH) + ' + (' + n2(RH) + ') = ' + n2(FH + RH) + ' \\end{aligned}',
+      d: RH + FH });
+    rows.push({ t: 'Momen terhadap titik A: ΣM_A = 0 (berlawanan jarum jam +)',
+      eq: '\\begin{aligned} \\textstyle\\sum M_{A,\\text{aksi}} &= ' + n2(MA) + '\\ \\text{kN·m} \\\\ \\textstyle\\sum M_{A,\\text{reaksi}} &= ' + (rm.length ? rm.join(' + ').replace(/\+ -/g, '-') + ' = ' : '') + n2(RM) + '\\ \\text{kN·m} \\\\ \\textstyle\\sum M_A &= ' + n2(MA) + ' + (' + n2(RM) + ') = ' + n2(MA + RM) + ' \\end{aligned}',
+      d: RM + MA });
+    var allOk = rows.every(function (r) { return ok(r.d); });
+    return '<div class="check-head ' + (allOk ? 'good' : 'bad') + '">' + (allOk ? '✓ Semua kontrol terpenuhi: reaksi = aksi.' : '✗ Ada kontrol yang tidak terpenuhi.') + '</div>' +
+      rows.map(function (r) {
+        return '<div class="check-row"><div class="check-t">' + r.t + ' ' + badge(r.d) + '</div>' + tex(r.eq.replace(/\\text\{kN·m\}/g, '\\text{kN}\\cdot\\text{m}')) + '</div>';
+      }).join('');
+  }
+
   function put(id, svg) { $(id).innerHTML = ''; $(id).appendChild(svg); }
 
   // ---------- tab ----------

@@ -306,3 +306,15 @@ input[type=number] { font-family: var(--font-mono); font-size: .9rem; }
 .board .katex { color: var(--chalk-y); font-size: 1.12em; text-shadow: 0 0 1px rgba(247,226,122,.5); }
 .board td .katex, .board .note .katex, .board p .katex { color: var(--chalk); font-size: 1.05em; }
 .board .katex .mord.text { color: var(--chalk-dim); }
+
+/* cek kontrol keseimbangan */
+.check { display: grid; gap: 10px; }
+.check-head { font-weight: 700; padding: 10px 14px; border-radius: 10px; }
+.check-head.good { background: color-mix(in srgb, var(--green) 14%, transparent); color: var(--green); }
+.check-head.bad { background: color-mix(in srgb, var(--red) 14%, transparent); color: var(--red); }
+.check-row { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; overflow-x: auto; }
+.check-t { font-weight: 600; font-size: .95rem; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.check .katex-display { margin: .5em 0 .2em; text-align: left; }
+.check .katex-display > .katex { text-align: left; }
+.check .ok { color: var(--green); font-size: .85rem; }
+.check .no { color: var(--red); font-size: .85rem; }
