@@ -16,7 +16,8 @@
   var header = document.createElement('header');
   header.className = 'site-header';
   header.innerHTML = '<div class="wrap"><a class="brand" href="' + root + 'index.html">' +
-    '<span class="brand-mark">SB</span>' + SITE + '</a><nav class="site-nav">' + nav + '</nav></div>';
+    '<img class="brand-mark" src="' + root + 'assets/logo.svg" alt="" width="30" height="30">' +
+    '<span>Sipil<span class="brand-accent">Belajar</span></span></a><nav class="site-nav">' + nav + '</nav></div>';
   document.body.insertBefore(header, document.body.firstChild);
 
   var footer = document.createElement('footer');
