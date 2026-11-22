@@ -115,7 +115,7 @@
     var minx = Math.min.apply(null, xs), maxx = Math.max.apply(null, xs), miny = Math.min.apply(null, ys), maxy = Math.max.apply(null, ys);
     var sx = maxx - minx, sy = maxy - miny, size = Math.max(sx, sy, 1);
     var D = (opts.D != null ? opts.D : 0.2) * size;   // tinggi maksimum diagram (satuan model)
-    var W = 680, padX = 56, padTop = opts.padTop, padBot = opts.padBot, maxH = 400;
+    var W = 680, padX = opts.padX || 56, padTop = opts.padTop, padBot = opts.padBot, maxH = 400;
     var s = Math.min((W - 2 * padX) / (sx + 2 * D), (maxH - padTop - padBot) / (sy + 2 * D));
     var H = Math.max(140, (sy + 2 * D) * s + padTop + padBot);
     var ox = (W - (sx + 2 * D) * s) / 2 + D * s - minx * s, oy = H - padBot - D * s + miny * s;
@@ -150,8 +150,22 @@
     return el('path', { d: 'M' + x + ' ' + y + 'L' + (x - ux * s - uy * s * .6) + ' ' + (y - uy * s + ux * s * .6) + 'L' + (x - ux * s + uy * s * .6) + ' ' + (y - uy * s - ux * s * .6) + 'Z', fill: color });
   }
 
+  function dimH(svg, x1, x2, y, extFrom, label, small) {
+    var c = 'var(--muted)';
+    if (extFrom != null) svg.appendChild(el('path', { d: 'M' + x1 + ' ' + extFrom + 'V' + (y + 6) + 'M' + x2 + ' ' + extFrom + 'V' + (y + 6), stroke: c, 'stroke-width': .8, 'stroke-dasharray': '3 3' }));
+    svg.appendChild(el('path', { d: 'M' + x1 + ' ' + y + 'H' + x2 + 'M' + (x1 - 4) + ' ' + (y + 4) + 'l8 -8M' + (x2 - 4) + ' ' + (y + 4) + 'l8 -8', stroke: c, 'stroke-width': 1.2 }));
+    svg.appendChild(el('text', { x: (x1 + x2) / 2, y: y - 5, 'text-anchor': 'middle', 'font-size': FS * (small ? 0.85 : 0.95), 'font-weight': 600, fill: 'var(--text)' }, label));
+  }
+  function dimV(svg, x, y1, y2, label, extX1, extX2) {
+    var c = 'var(--muted)';
+    svg.appendChild(el('path', { d: 'M' + extX1 + ' ' + y1 + 'H' + (x + 6) + 'M' + extX2 + ' ' + y2 + 'H' + (x + 6), stroke: c, 'stroke-width': .8, 'stroke-dasharray': '3 3' }));
+    svg.appendChild(el('path', { d: 'M' + x + ' ' + y1 + 'V' + y2 + 'M' + (x - 4) + ' ' + (y1 + 4) + 'l8 -8M' + (x - 4) + ' ' + (y2 + 4) + 'l8 -8', stroke: c, 'stroke-width': 1.2 }));
+    var ty = (y1 + y2) / 2;
+    svg.appendChild(el('text', { x: x + 6, y: ty, 'text-anchor': 'middle', 'font-size': FS * 0.95, 'font-weight': 600, fill: 'var(--text)', transform: 'rotate(-90 ' + (x + 6) + ' ' + ty + ')', dy: '1em' }, label));
+  }
+
   function drawStruct(model, res) {
-    var v = view(model, { padTop: 70, padBot: 76, D: 0.04 });
+    var v = view(model, { padTop: 70, padBot: 124, D: 0.04, padX: 84 });
     var svg = el('svg', { viewBox: '0 0 ' + v.W + ' ' + v.H, role: 'img', 'aria-label': 'Gambar struktur dan beban' });
     var col = 'var(--accent)';
     // beban batang
@@ -193,13 +207,29 @@
       var a = model.nodes[m.i], b = model.nodes[m.j];
       svg.appendChild(el('line', { x1: v.X(a.x), y1: v.Y(a.y), x2: v.X(b.x), y2: v.Y(b.y), stroke: 'var(--text)', 'stroke-width': 5, 'stroke-linecap': 'round' }));
     });
-    // dimensi bentang (balok menerus)
+    // garis ukur (dimensi)
+    var ys0 = Math.max.apply(null, model.nodes.map(function (n) { return v.Y(n.y); }));
+    var yDim = ys0 + 26 + FS * 4.2;
     if (current === 'menerus') {
-      var y0 = v.Y(0) + 64;
       model.members.forEach(function (m) {
         var a = model.nodes[m.i], b = model.nodes[m.j];
-        svg.appendChild(el('text', { x: (v.X(a.x) + v.X(b.x)) / 2, y: v.Y(0) + 16, 'text-anchor': 'middle', 'font-size': FS * 0.92, fill: 'var(--muted)' }, fmt(m.L, 2) + ' m'));
+        dimH(svg, v.X(a.x), v.X(b.x), yDim, yDim - 14, fmt(m.L, 2) + ' m');
       });
+    } else if (current === 'miring') {
+      var A = model.nodes[0], B2 = model.nodes[1];
+      dimH(svg, v.X(A.x), v.X(B2.x), yDim, yDim - 14, 'Lx = ' + fmt(B2.x - A.x, 2) + ' m');
+      if (B2.y > A.y) dimV(svg, v.X(B2.x) + 46, v.Y(A.y), v.Y(B2.y), 'h = ' + fmt(B2.y - A.y, 2) + ' m', v.X(B2.x) + 22, v.X(A.x) + 8);
+      var mx = (v.X(A.x) + v.X(B2.x)) / 2, my = (v.Y(A.y) + v.Y(B2.y)) / 2, ang = -Math.atan2(B2.y - A.y, B2.x - A.x) * 180 / Math.PI;
+      svg.appendChild(el('text', { x: mx + 14, y: my + 22, 'font-size': FS * 0.92, fill: 'var(--muted)', 'text-anchor': 'middle', transform: 'rotate(' + ang + ' ' + (mx + 14) + ' ' + (my + 22) + ')' }, 'L = ' + fmt(Math.hypot(B2.x - A.x, B2.y - A.y), 2) + ' m'));
+    } else {
+      var n0 = model.nodes[0], n1 = model.nodes[1], n2 = model.nodes[2], n3 = model.nodes[3];
+      dimH(svg, v.X(n0.x), v.X(n3.x), yDim, yDim - 14, 'L = ' + fmt(n3.x - n0.x, 2) + ' m');
+      dimV(svg, v.X(n3.x) + 50, v.Y(n3.y), v.Y(n2.y), 'H = ' + fmt(n2.y - n3.y, 2) + ' m', v.X(n3.x) + 26, v.X(n2.x) + 8);
+      var Pl = (model.members[1].loads || []).filter(function (l) { return l.type === 'point'; })[0];
+      if (Pl) {
+        var yP = v.Y(n1.y) + 18;
+        dimH(svg, v.X(n1.x), v.X(n1.x + Pl.a), yP, null, 'a = ' + fmt(Pl.a, 2) + ' m', true);
+      }
     }
     drawSupports(svg, v, model, res, true);
     return svg;
