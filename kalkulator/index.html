@@ -5,25 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kalkulator · SipilBelajar</title>
   <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body data-root="../" data-page="kalkulator">
 <main class="wrap">
-  <h1>Kalkulator struktur</h1>
-  <p class="muted">Semua perhitungan berjalan di browser Anda. Tidak ada data yang dikirim ke server.</p>
+  <header class="page-head">
+    <h1>Kalkulator struktur</h1>
+    <p>Semua perhitungan berjalan di browser Anda. Tidak ada data yang dikirim ke server.</p>
+  </header>
   <div class="grid">
     <a class="card" href="balok.html">
       <span class="tag">Statika</span>
       <h3>Balok: geser, momen &amp; lendutan</h3>
       <p>Balok sederhana atau kantilever, beban terpusat dan merata (penuh atau sebagian).</p>
+      <span class="go">Buka →</span>
     </a>
     <a class="card" href="penampang.html">
       <span class="tag">Mekanika Bahan</span>
       <h3>Properti penampang</h3>
       <p>A, ȳ, Ix, Iy, Sx, rx untuk persegi, lingkaran, pipa, I/WF, dan T.</p>
+      <span class="go">Buka →</span>
     </a>
-    <div class="card"><span class="tag soon">Segera</span><h3>Tulangan balok beton</h3><p>Kebutuhan tulangan lentur balok persegi.</p></div>
-    <div class="card"><span class="tag soon">Segera</span><h3>Kolom baja tekan</h3><p>Kuat tekan nominal batang tekan profil baja.</p></div>
+    <div class="card soon"><span class="tag soon">Segera</span><h3>Tulangan balok beton</h3><p>Kebutuhan tulangan lentur balok persegi.</p></div>
+    <div class="card soon"><span class="tag soon">Segera</span><h3>Kolom baja tekan</h3><p>Kuat tekan nominal batang tekan profil baja.</p></div>
   </div>
 </main>
 <script src="../assets/layout.js"></script>

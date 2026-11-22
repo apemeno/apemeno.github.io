@@ -6,50 +6,132 @@
   <title>SipilBelajar</title>
   <meta name="description" content="Belajar teknik sipil: tutorial, contoh soal, dan kalkulator struktur interaktif.">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body data-root="" data-page="home">
 <main class="wrap">
   <section class="hero">
-    <div class="eyebrow">Teknik Sipil · Belajar mandiri</div>
-    <h1>Belajar analisis struktur, langkah demi langkah</h1>
-    <p class="lead">Tutorial ringkas dengan contoh soal, ditemani kalkulator interaktif untuk mengecek hitungan tangan Anda: reaksi tumpuan, gaya geser, momen, lendutan, dan properti penampang.</p>
-    <div class="btn-row">
-      <a class="btn" href="kalkulator/balok.html">Coba kalkulator balok</a>
-      <a class="btn secondary" href="tutorial/index.html">Lihat tutorial</a>
+    <div>
+      <span class="eyebrow">Teknik Sipil · Belajar mandiri</span>
+      <h1>Pahami struktur, <span class="grad-text">bukan sekadar rumus.</span></h1>
+      <p class="lead">Tutorial ringkas dengan contoh soal, ditemani kalkulator interaktif untuk mengecek hitungan tangan Anda: reaksi tumpuan, gaya geser, momen, lendutan, dan properti penampang.</p>
+      <div class="btn-row">
+        <a class="btn primary" href="kalkulator/balok.html">Coba kalkulator balok →</a>
+        <a class="btn secondary" href="tutorial/index.html">Mulai belajar</a>
+      </div>
+      <div class="stats-row">
+        <div><b>2</b>kalkulator</div>
+        <div><b>2</b>tutorial + contoh soal</div>
+        <div><b>100%</b>gratis, tanpa daftar</div>
+      </div>
+    </div>
+
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 480 300">
+        <defs>
+          <linearGradient id="hg" x1="0" x2="1"><stop offset="0" stop-color="#ff8a3d"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+          <marker id="ha" viewBox="0 0 10 10" refX="5" refY="10" markerWidth="6" markerHeight="6"><path d="M0 0L5 10L10 0Z" fill="#ff8a3d"/></marker>
+        </defs>
+        <!-- beban merata -->
+        <g stroke="#ff8a3d" stroke-width="1.5">
+          <path d="M60 52H420" stroke-opacity=".6"/>
+          <path d="M60 52V84" marker-end="url(#ha)"/>
+          <path d="M96 52V84" marker-end="url(#ha)"/>
+          <path d="M132 52V84" marker-end="url(#ha)"/>
+          <path d="M168 52V84" marker-end="url(#ha)"/>
+          <path d="M204 52V84" marker-end="url(#ha)"/>
+          <path d="M240 52V84" marker-end="url(#ha)"/>
+          <path d="M276 52V84" marker-end="url(#ha)"/>
+          <path d="M312 52V84" marker-end="url(#ha)"/>
+          <path d="M348 52V84" marker-end="url(#ha)"/>
+          <path d="M384 52V84" marker-end="url(#ha)"/>
+          <path d="M420 52V84" marker-end="url(#ha)"/>
+        </g>
+        <text x="240" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#ff8a3d">q = 5 kN/m</text>
+        <!-- balok -->
+        <rect x="52" y="90" width="376" height="10" rx="3" fill="currentColor" style="color:var(--text)"/>
+        <!-- lendutan (animasi) -->
+        <path class="dash-anim" d="M60 100Q240 150 420 100" fill="none" stroke="#22d3ee" stroke-width="1.6"/>
+        <!-- tumpuan -->
+        <path d="M60 100l-12 20h24z M420 100l-12 18h24z" fill="none" stroke="currentColor" style="color:var(--muted)" stroke-width="1.5"/>
+        <path d="M406 124h28" stroke="currentColor" style="color:var(--muted)" stroke-width="1.5"/>
+        <!-- dimensi -->
+        <path d="M60 140H420M60 134v12M420 134v12" stroke="currentColor" style="color:var(--muted)" stroke-width="1" />
+        <text x="240" y="158" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor" style="color:var(--muted)">L = 6,00 m</text>
+        <!-- BMD -->
+        <path d="M60 170Q240 290 420 170Z" fill="url(#hg)" fill-opacity=".14"/>
+        <path d="M60 170Q240 290 420 170" fill="none" stroke="url(#hg)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M60 170H420" stroke="currentColor" style="color:var(--muted)" stroke-opacity=".6"/>
+        <path d="M240 170V230" stroke="currentColor" style="color:var(--muted)" stroke-dasharray="3 3"/>
+        <circle cx="240" cy="230" r="4" fill="#22d3ee"/>
+        <text x="252" y="246" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="15" fill="currentColor" style="color:var(--text)">M maks = qL²/8 = 22,5 kN·m</text>
+        <circle cx="60" cy="170" r="3.5" fill="#ff8a3d"/><circle cx="420" cy="170" r="3.5" fill="#22d3ee"/>
+      </svg>
+      <div class="cap"><span>// diagram momen lentur</span><span>δ = 5qL⁴ / 384EI</span></div>
     </div>
   </section>
 
-  <h2>Kalkulator struktur</h2>
+  <div class="section-head">
+    <div><h2>Kalkulator struktur</h2><p>Masukkan data, hasil dan diagram langsung muncul.</p></div>
+    <a href="kalkulator/index.html">Semua kalkulator →</a>
+  </div>
   <div class="grid">
     <a class="card" href="kalkulator/balok.html">
-      <span class="tag">Tersedia</span>
+      <div class="card-top">
+        <span class="icon o"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 10h18"/><path d="M5 10l-2 4h4z M19 10l-2 4h4z"/><path d="M8 4v4M12 4v4M16 4v4"/><path d="M4 18q8 5 16 0"/></svg></span>
+        <span class="tag">Statika</span>
+      </div>
       <h3>Balok: geser, momen &amp; lendutan</h3>
-      <p>Balok sederhana atau kantilever dengan beban terpusat dan beban merata. Lengkap dengan diagram SFD, BMD, dan lendutan.</p>
+      <p>Balok sederhana atau kantilever dengan beban terpusat dan merata. Lengkap dengan diagram SFD, BMD, dan lendutan.</p>
+      <span class="go">Buka kalkulator →</span>
     </a>
     <a class="card" href="kalkulator/penampang.html">
-      <span class="tag">Tersedia</span>
+      <div class="card-top">
+        <span class="icon c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 4h14v3h-5.5v10H19v3H5v-3h5.5V7H5z"/></svg></span>
+        <span class="tag c">Mekanika Bahan</span>
+      </div>
       <h3>Properti penampang</h3>
-      <p>Luas, titik berat, momen inersia, modulus penampang, dan jari-jari girasi untuk persegi, lingkaran, pipa, profil I/WF, dan T.</p>
+      <p>Luas, titik berat, momen inersia, modulus penampang, dan jari-jari girasi untuk persegi, pipa, profil I/WF, dan T.</p>
+      <span class="go">Buka kalkulator →</span>
     </a>
-    <div class="card">
-      <span class="tag soon">Segera</span>
+    <div class="card soon">
+      <div class="card-top">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="8.5" cy="15.5" r="1.3"/><circle cx="12" cy="15.5" r="1.3"/><circle cx="15.5" cy="15.5" r="1.3"/></svg></span>
+        <span class="tag soon">Segera</span>
+      </div>
       <h3>Tulangan balok beton</h3>
       <p>Perhitungan kebutuhan tulangan lentur balok beton bertulang.</p>
     </div>
   </div>
 
-  <h2>Tutorial terbaru</h2>
+  <div class="section-head">
+    <div><h2>Cara belajar di sini</h2><p>Tiga langkah yang sama untuk setiap topik.</p></div>
+  </div>
+  <div class="steps">
+    <div class="step"><h3>Baca konsepnya</h3><p>Teori singkat dan rumus inti, tanpa bertele-tele.</p></div>
+    <div class="step"><h3>Kerjakan contoh soal</h3><p>Ikuti penyelesaian langkah demi langkah dengan angka nyata.</p></div>
+    <div class="step"><h3>Cek dengan kalkulator</h3><p>Ubah angka, lihat diagramnya berubah, dan pastikan jawaban Anda benar.</p></div>
+  </div>
+
+  <div class="section-head">
+    <div><h2>Tutorial terbaru</h2></div>
+    <a href="tutorial/index.html">Semua tutorial →</a>
+  </div>
   <div class="grid">
     <a class="card" href="tutorial/balok-sederhana.html">
-      <span class="tag">Statika</span>
+      <div class="card-top"><span class="tag">Statika</span><span class="muted" style="font-size:.82rem">± 10 menit</span></div>
       <h3>Gaya dalam pada balok sederhana</h3>
       <p>Reaksi tumpuan, gaya geser, dan momen lentur, dengan contoh soal beban terpusat dan merata.</p>
+      <span class="go">Baca tutorial →</span>
     </a>
     <a class="card" href="tutorial/momen-inersia.html">
-      <span class="tag">Mekanika Bahan</span>
+      <div class="card-top"><span class="tag c">Mekanika Bahan</span><span class="muted" style="font-size:.82rem">± 10 menit</span></div>
       <h3>Momen inersia penampang</h3>
       <p>Titik berat, momen inersia, dan teorema sumbu sejajar, dengan contoh penampang T.</p>
+      <span class="go">Baca tutorial →</span>
     </a>
   </div>
 </main>

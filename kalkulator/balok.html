@@ -5,13 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kalkulator Balok · SipilBelajar</title>
   <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body data-root="../" data-page="kalkulator">
 <main class="wrap">
-  <div class="breadcrumb"><a href="index.html">Kalkulator</a> › Statika</div>
-  <h1>Kalkulator balok</h1>
-  <p class="muted">Reaksi tumpuan, diagram gaya geser (SFD), momen lentur (BMD), dan lendutan. Beban ke bawah bernilai positif. Momen positif = serat bawah tertarik.</p>
+  <header class="page-head">
+    <div class="breadcrumb"><a href="index.html">Kalkulator</a> › Statika</div>
+    <h1>Kalkulator balok</h1>
+    <p>Reaksi tumpuan, diagram gaya geser (SFD), momen lentur (BMD), dan lendutan. Beban ke bawah bernilai positif. Momen positif = serat bawah tertarik.</p>
+  </header>
 
   <div class="calc">
     <form id="form" autocomplete="off" onsubmit="return false">
@@ -32,7 +37,7 @@
           <div><label for="E">E (MPa)</label><input id="E" type="number" step="any" value="200000"></div>
           <div><label for="I">I (×10⁶ mm⁴)</label><input id="I" type="number" step="any" value="100"></div>
         </div>
-        <p class="muted" style="font-size:.85rem;margin:8px 0 0">Baja ≈ 200.000 MPa. Beton ≈ 4700√f'c MPa.</p>
+        <p class="hint">Baja ≈ 200.000 MPa. Beton ≈ 4700√f'c MPa.</p>
       </fieldset>
 
       <fieldset>

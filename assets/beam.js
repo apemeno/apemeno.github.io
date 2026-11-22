@@ -125,8 +125,8 @@
     var sx = function (x) { return pl + x / L * (W - pl - pr); };
     var svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'Skema balok' });
     var defs = el('defs', {});
-    var mk = el('marker', { id: 'arr', viewBox: '0 0 10 10', refX: 5, refY: 9, markerWidth: 7, markerHeight: 7, orient: 'auto' });
-    mk.appendChild(el('path', { d: 'M0 0 L5 10 L10 0 Z', fill: 'var(--red)' }));
+    var mk = el('marker', { id: 'arr', viewBox: '0 0 10 10', refX: 5, refY: 10, markerWidth: 7, markerHeight: 7 });
+    mk.appendChild(el('path', { d: 'M0 0 L5 10 L10 0 Z', fill: 'var(--accent)' }));
     defs.appendChild(mk);
     var mk2 = el('marker', { id: 'arrUp', viewBox: '0 0 10 10', refX: 5, refY: 1, markerWidth: 7, markerHeight: 7, orient: 'auto' });
     mk2.appendChild(el('path', { d: 'M0 10 L5 0 L10 10 Z', fill: 'var(--green)' }));
@@ -138,20 +138,20 @@
     loads.forEach(function (ld) {
       if (ld.type !== 'udl') return;
       var h = 14 + 22 * Math.abs(ld.w) / maxW, x1 = sx(ld.a), x2 = sx(ld.b);
-      svg.appendChild(el('rect', { x: x1, y: by - 6 - h, width: Math.max(x2 - x1, 1), height: h, fill: 'var(--red)', 'fill-opacity': .12, stroke: 'var(--red)', 'stroke-width': 1 }));
+      svg.appendChild(el('rect', { x: x1, y: by - 6 - h, width: Math.max(x2 - x1, 1), height: h, fill: 'var(--accent)', 'fill-opacity': .12, stroke: 'var(--accent)', 'stroke-width': 1 }));
       var n = Math.max(2, Math.round((x2 - x1) / 30));
       for (var i = 0; i <= n; i++) {
         var xx = x1 + (x2 - x1) * i / n;
-        svg.appendChild(el('line', { x1: xx, x2: xx, y1: by - 6 - h, y2: by - 9, stroke: 'var(--red)', 'marker-end': 'url(#arr)' }));
+        svg.appendChild(el('line', { x1: xx, x2: xx, y1: by - 6 - h, y2: by - 9, stroke: 'var(--accent)', 'marker-end': 'url(#arr)' }));
       }
-      svg.appendChild(el('text', { x: (x1 + x2) / 2, y: by - 10 - h, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--red)' }, fmt(ld.w, 2) + ' kN/m'));
+      svg.appendChild(el('text', { x: (x1 + x2) / 2, y: by - 10 - h, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--accent)' }, fmt(ld.w, 2) + ' kN/m'));
     });
     // beban terpusat
     loads.forEach(function (ld) {
       if (ld.type !== 'point') return;
       var x = sx(ld.a);
-      svg.appendChild(el('line', { x1: x, x2: x, y1: 14, y2: by - 9, stroke: 'var(--red)', 'stroke-width': 2, 'marker-end': 'url(#arr)' }));
-      svg.appendChild(el('text', { x: x + 5, y: 22, 'font-size': 12, 'font-weight': 700, fill: 'var(--red)' }, fmt(ld.P, 2) + ' kN'));
+      svg.appendChild(el('line', { x1: x, x2: x, y1: 14, y2: by - 9, stroke: 'var(--accent)', 'stroke-width': 2, 'marker-end': 'url(#arr)' }));
+      svg.appendChild(el('text', { x: x + 5, y: 22, 'font-size': 12, 'font-weight': 700, fill: 'var(--accent)' }, fmt(ld.P, 2) + ' kN'));
     });
     // balok
     svg.appendChild(el('rect', { x: sx(0), y: by - 5, width: sx(L) - sx(0), height: 10, fill: 'var(--text)', rx: 2 }));

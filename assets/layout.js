@@ -15,14 +15,20 @@
 
   var header = document.createElement('header');
   header.className = 'site-header';
-  header.innerHTML = '<div class="wrap"><a class="brand" href="' + root + 'index.html">' +
-    '<img class="brand-mark" src="' + root + 'assets/logo.svg" alt="" width="30" height="30">' +
-    '<span>Sipil<span class="brand-accent">Belajar</span></span></a><nav class="site-nav">' + nav + '</nav></div>';
+  header.innerHTML = '<div class="wrap"><a class="brand" href="' + root + 'index.html" aria-label="' + SITE + ' beranda">' +
+    '<img class="brand-mark" src="' + root + 'assets/logo.svg" alt="" width="32" height="32">' +
+    '<span class="brand-text">Sipil<span class="brand-accent">Belajar</span></span></a><nav class="site-nav">' + nav + '</nav></div>';
   document.body.insertBefore(header, document.body.firstChild);
 
   var footer = document.createElement('footer');
   footer.className = 'site-footer';
-  footer.innerHTML = '<div class="wrap">© ' + new Date().getFullYear() + ' ' + SITE +
-    ' · Materi dan kalkulator untuk belajar. Selalu periksa ulang hasil perhitungan sebelum dipakai untuk desain nyata.</div>';
+  footer.innerHTML = '<div class="wrap"><div class="footer-grid">' +
+    '<div><a class="brand" href="' + root + 'index.html"><img class="brand-mark" src="' + root + 'assets/logo.svg" alt="" width="28" height="28">' +
+    '<span>Sipil<span class="brand-accent">Belajar</span></span></a>' +
+    '<p style="max-width:340px;margin:10px 0 0">Tutorial dan kalkulator struktur untuk mahasiswa teknik sipil. Gratis, dan semua hitungan berjalan di browser Anda.</p></div>' +
+    '<div><h4>Kalkulator</h4><ul><li><a href="' + root + 'kalkulator/balok.html">Balok</a></li><li><a href="' + root + 'kalkulator/penampang.html">Properti penampang</a></li></ul></div>' +
+    '<div><h4>Tutorial</h4><ul><li><a href="' + root + 'tutorial/balok-sederhana.html">Gaya dalam balok</a></li><li><a href="' + root + 'tutorial/momen-inersia.html">Momen inersia</a></li></ul></div>' +
+    '</div><div class="footer-note">© ' + new Date().getFullYear() + ' ' + SITE +
+    ' · Untuk belajar. Selalu periksa ulang hasil perhitungan sebelum dipakai untuk desain nyata.</div></div>';
   document.body.appendChild(footer);
 })();

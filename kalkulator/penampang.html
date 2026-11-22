@@ -5,13 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Properti Penampang · SipilBelajar</title>
   <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body data-root="../" data-page="kalkulator">
 <main class="wrap">
-  <div class="breadcrumb"><a href="index.html">Kalkulator</a> › Mekanika Bahan</div>
-  <h1>Properti penampang</h1>
-  <p class="muted">Luas, titik berat, momen inersia, modulus penampang, dan jari-jari girasi. Semua dimensi dalam mm. Sumbu x horizontal (lentur terhadap sumbu kuat).</p>
+  <header class="page-head">
+    <div class="breadcrumb"><a href="index.html">Kalkulator</a> › Mekanika Bahan</div>
+    <h1>Properti penampang</h1>
+    <p>Luas, titik berat, momen inersia, modulus penampang, dan jari-jari girasi. Semua dimensi dalam mm. Sumbu x horizontal (lentur terhadap sumbu kuat).</p>
+  </header>
 
   <div class="calc">
     <form id="form" autocomplete="off" onsubmit="return false">
@@ -31,7 +36,7 @@
         <div id="dims" class="row"></div>
       </fieldset>
       <div class="error" id="err"></div>
-      <p class="muted" style="font-size:.85rem">Profil I/WF dihitung tanpa jari-jari peralihan (fillet), jadi nilainya sedikit lebih kecil dari tabel baja.</p>
+      <p class="hint">Profil I/WF dihitung tanpa jari-jari peralihan (fillet), jadi nilainya sedikit lebih kecil dari tabel baja.</p>
     </form>
 
     <section aria-live="polite">
