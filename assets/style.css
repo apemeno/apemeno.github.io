@@ -456,3 +456,9 @@ input[type=number] { font-family: var(--font-mono); font-size: .9rem; }
 .menu > li.pro > a { color: #0f1216; background: linear-gradient(90deg, #ff8a3d, #22d3ee); margin: 10px 0 10px 8px; padding: 0 14px; border-radius: 8px; }
 .menu > li.pro:hover > a, .menu > li.pro.current > a { color: #0f1216; filter: brightness(1.08); box-shadow: none; }
 @media (max-width: 900px) { .menu > li.pro > a { margin: 8px 16px; padding: 12px 14px; } }
+.menu > li > a { white-space: nowrap; }
+@media (min-width: 901px) and (max-width: 1120px) {
+  .menu > li > a { padding: 0 10px; font-size: .84rem; letter-spacing: .03em; }
+  .menu > li.pro > a { padding: 0 10px; margin-left: 4px; }
+  .nav-search .search-btn span { display: none; }
+}

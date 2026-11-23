@@ -26,6 +26,7 @@
       ['Statika: portal', 'kalkulator/statika.html#portal'],
       ['Properti penampang', 'kalkulator/penampang.html'],
       ['SortirSAP: rekap output SAP2000', 'kalkulator/sortir-sap/']] },
+    { id: 'sortirsap', t: 'SortirSAP', u: 'kalkulator/sortir-sap/' },
     { id: 'peraturan', t: 'Peraturan', u: 'peraturan.html' },
     { id: 'berlangganan', t: '★ Premium', u: 'berlangganan.html', cls: 'pro' }
   ];
