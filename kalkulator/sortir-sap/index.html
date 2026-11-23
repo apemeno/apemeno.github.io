@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SortirSAP – Rekap Mu, Pu, Vu &amp; Tulangan dari SAP2000</title>
+<meta name="author" content="Jauhari">
+<link rel="canonical" href="https://sipilbelajar.netlify.app/kalkulator/sortir-sap/">
+<meta property="og:title" content="SortirSAP · SipilBelajar">
+<meta property="og:description" content="Rekap otomatis Mu, Pu, Vu dan tulangan maksimum dari output SAP2000 per penampang balok dan kolom.">
+<meta property="og:url" content="https://sipilbelajar.netlify.app/kalkulator/sortir-sap/">
+<meta property="og:site_name" content="SipilBelajar">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://sipilbelajar.netlify.app/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sipilbelajar.netlify.app/assets/og-image.png">
+<link rel="icon" type="image/svg+xml" href="../../assets/logo.svg">
+<meta name="copyright" content="© 2026 Jauhari — SipilBelajar">
+<meta name="description" content="Sortir otomatis nilai Mu, Pu, Vu, Tu dan tulangan perlu maksimum dari output SAP2000 per penampang balok dan kolom, siap untuk perhitungan manual.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="../../assets/vendor/xlsx-0.18.5.full.min.js"></script>
+<style>
+:root{
+  --bg:#f3f5f9;--sf:#ffffff;--sf2:#f8fafc;--ink:#0f1b2d;--mu:#5b6b82;--ln:#e3e8ef;--ln2:#d5dce6;
+  --pr:#1d4ed8;--pr2:#e8efff;--prInk:#fff;--ac:#f59e0b;--ok:#0f8a5f;--okBg:#e7f6ef;--er:#c2352b;--erBg:#fdecea;--wr:#b45309;--wrBg:#fff4e0;
+  --mom:#e8efff;--momI:#1d4ed8;--shr:#e3f6f4;--shrI:#0f766e;--tor:#f1ebff;--torI:#6d28d9;--reb:#fff3dc;--rebI:#a16207;--sti:#e8f7e9;--stiI:#15803d;
+  --sh:0 1px 2px rgba(15,27,45,.05),0 4px 16px rgba(15,27,45,.05);--r:14px;
+  --hd1:#0a1a33;--hd2:#12345f;
+}
+[data-theme=dark]{
+  --bg:#0a1120;--sf:#111a2c;--sf2:#0e1626;--ink:#e6edf7;--mu:#8fa1ba;--ln:#1f2b40;--ln2:#2a3852;
+  --pr:#6ea8ff;--pr2:#16264a;--prInk:#0a1120;--ok:#4cc38a;--okBg:#10291f;--er:#ff8a80;--erBg:#331614;--wr:#fbbf24;--wrBg:#2e2210;
+  --mom:#16264a;--momI:#8db8ff;--shr:#0f2a2a;--shrI:#5eead4;--tor:#231a3d;--torI:#c4b5fd;--reb:#2d2310;--rebI:#fcd34d;--sti:#11291a;--stiI:#86efac;
+  --sh:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);--hd1:#060d1a;--hd2:#0d2346;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:14px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+.num,td,input[type=number]{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace}
+button{font:inherit}
+a{color:var(--pr)}
+
+/* ---------- Header ---------- */
+.hero{position:relative;color:#fff;background:
+  linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px) 0 0/28px 28px,
+  linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px) 0 0/28px 28px,
+  linear-gradient(135deg,var(--hd1),var(--hd2));overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.22),transparent 65%)}
+.nav{max-width:1480px;margin:auto;padding:16px 28px;display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.2px}
+.logo svg{flex:none}
+.logo small{display:block;font-weight:500;font-size:11.5px;opacity:.7;letter-spacing:.2px}
+.nav .sp{flex:1}
+.ibtn{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;border-radius:10px;padding:7px 12px;cursor:pointer;font-weight:600;font-size:13px}
+.ibtn:hover{background:rgba(255,255,255,.16)}
+.heroIn{max-width:1480px;margin:auto;padding:14px 28px 34px;position:relative;z-index:1}
+.hero h1{font-size:clamp(24px,3.2vw,34px);line-height:1.15;margin:0 0 8px;letter-spacing:-.6px;font-weight:800}
+.hero h1 em{font-style:normal;color:var(--ac)}
+.hero p{margin:0;max-width:760px;opacity:.82;font-size:15px}
+.steps{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.step{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:8px 14px 8px 8px;font-size:13px}
+.step b{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--ac);color:#1b1300;font-size:13px}
+
+/* ---------- Layout ---------- */
+.layout{max-width:1480px;margin:-18px auto 0;padding:0 28px 48px;display:grid;grid-template-columns:380px minmax(0,1fr);gap:20px;align-items:start;position:relative;z-index:2}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}}
+aside{display:grid;gap:14px}
+@media(min-width:1101px){aside{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto;padding-right:2px}}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:var(--r);box-shadow:var(--sh)}
+.cbody{padding:16px 18px}
+.chead{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--ln);font-weight:700}
+.chead .n{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:var(--pr2);color:var(--pr);font-size:12.5px;font-weight:800}
+.chead .sp{flex:1}
+details.acc>summary{list-style:none;cursor:pointer}
+details.acc>summary::-webkit-details-marker{display:none}
+details.acc>summary .chev{transition:transform .2s;color:var(--mu)}
+details.acc[open]>summary .chev{transform:rotate(180deg)}
+details.acc:not([open])>summary{border-bottom:0}
+
+/* ---------- Input ---------- */
+#drop{border:1.5px dashed var(--ln2);border-radius:12px;padding:22px 14px;text-align:center;cursor:pointer;background:var(--sf2);transition:.15s}
+#drop:hover,#drop.hov{border-color:var(--pr);background:var(--pr2)}
+#drop .ico{width:44px;height:44px;border-radius:12px;background:var(--pr2);color:var(--pr);display:grid;place-items:center;margin:0 auto 8px}
+#drop b{display:block;font-size:14px}
+#drop span{color:var(--mu);font-size:12.5px}
+textarea{width:100%;min-height:70px;margin-top:10px;font:12px "JetBrains Mono",monospace;background:var(--sf2);color:var(--ink);border:1px solid var(--ln);border-radius:10px;padding:9px 10px;resize:vertical}
+textarea:focus,select:focus,input:focus{outline:2px solid color-mix(in srgb,var(--pr) 35%,transparent);outline-offset:1px;border-color:var(--pr)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--pr);color:var(--prInk);border:1px solid var(--pr);border-radius:10px;padding:8px 14px;font-weight:600;font-size:13.5px;cursor:pointer;transition:.15s}
+.btn:hover{filter:brightness(1.08)}
+.btn.gh{background:transparent;color:var(--ink);border-color:var(--ln2)}
+.btn.gh:hover{background:var(--sf2);border-color:var(--pr);color:var(--pr)}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:8px}
+.btn.acc{background:var(--ac);border-color:var(--ac);color:#1b1300}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mt{margin-top:10px}
+.status{margin-top:12px;font-size:12.5px;padding:8px 10px;border-radius:10px;background:var(--sf2);color:var(--mu);display:flex;gap:8px;align-items:flex-start}
+.status.ok{background:var(--okBg);color:var(--ok)}.status.err{background:var(--erBg);color:var(--er)}
+.status:empty{display:none}
+.file{border:1px solid var(--ln);border-radius:10px;padding:9px 11px;margin-top:10px;background:var(--sf2)}
+.file .fh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:600;font-size:13px}
+.tb{font-size:12px;margin-top:4px;display:flex;gap:6px;align-items:baseline}
+.tb .d{width:7px;height:7px;border-radius:50%;flex:none;transform:translateY(-1px)}
+.tb.ok .d{background:var(--ok)}.tb.skip .d{background:var(--ln2)}
+.tb span{color:var(--mu)}
+.x{background:none;border:0;color:var(--mu);cursor:pointer;border-radius:6px;padding:2px 6px}
+.x:hover{background:var(--erBg);color:var(--er)}
+
+/* ---------- Form ---------- */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mu);font-weight:500}
+label.f.w{grid-column:1/-1}
+select,input[type=number],input[type=search]{font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--ln);border-radius:9px;background:var(--sf);color:var(--ink);width:100%}
+input[type=number]{font-size:12.5px}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.preset{border:1px solid var(--ln);background:var(--sf2);color:var(--ink);border-radius:10px;padding:8px 10px;text-align:left;cursor:pointer;font-size:12px;line-height:1.3}
+.preset b{display:block;font-size:12.5px}
+.preset span{color:var(--mu)}
+.preset:hover,.preset.on{border-color:var(--pr);background:var(--pr2)}
+.sub2{font-size:12px;color:var(--mu);margin:12px 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+details.mini summary{cursor:pointer;font-size:12.5px;color:var(--pr);font-weight:600;margin-top:12px}
+.hint{font-size:11.5px;color:var(--mu);margin-top:6px}
+#cases{display:flex;flex-wrap:wrap;gap:6px;max-height:170px;overflow:auto}
+.chk{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ln);border-radius:999px;padding:4px 10px 4px 8px;font-size:12px;cursor:pointer;white-space:nowrap;background:var(--sf2);user-select:none}
+.chk:has(input:checked){border-color:var(--pr);background:var(--pr2);color:var(--pr)}
+.chk input{accent-color:var(--pr);margin:0}
+.chk small{color:var(--mu);font-size:10.5px}
+.help ol{padding-left:18px;margin:6px 0;font-size:12.5px}.help ul{padding-left:16px;margin:4px 0}
+.help li{margin:3px 0}
+
+/* ---------- Results ---------- */
+main{display:grid;gap:16px;min-width:0}
+main>*{min-width:0}
+.layout>*{min-width:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px}
+.kpi{background:var(--sf);border:1px solid var(--ln);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c,var(--pr))}
+.kpi .l{font-size:12px;color:var(--mu);font-weight:600}
+.kpi .v{font:700 22px/1.25 "JetBrains Mono",monospace;margin-top:4px;letter-spacing:-.5px}
+.kpi .v small{font-size:12px;font-weight:500;color:var(--mu);margin-left:4px;font-family:"Plus Jakarta Sans",sans-serif}
+.kpi .s{font-size:11.5px;color:var(--mu);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px 0 14px;border-bottom:1px solid var(--ln)}
+.tabs{display:flex;gap:2px}
+.tab{background:none;border:0;padding:11px 14px;color:var(--mu);cursor:pointer;border-bottom:2.5px solid transparent;font-weight:600;font-size:13.5px;display:flex;gap:7px;align-items:center}
+.tab .c{font:600 11px "JetBrains Mono",monospace;background:var(--sf2);border:1px solid var(--ln);border-radius:999px;padding:1px 7px;color:var(--mu)}
+.tab.on{color:var(--pr);border-bottom-color:var(--pr)}
+.tab.on .c{background:var(--pr2);border-color:transparent;color:var(--pr)}
+.rhead .sp{flex:1}
+.search{position:relative;margin-bottom:8px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mu)}
+.search input{padding-left:32px;width:240px}
+.rbody{padding:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{font-size:12px;border-radius:999px;padding:4px 10px;background:var(--sf2);border:1px solid var(--ln);color:var(--mu)}
+.chip b{color:var(--ink);font-weight:600}
+.chip.w{background:var(--wrBg);border-color:transparent;color:var(--wr)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.tools .sp{flex:1}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--mu)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.tw{overflow:auto;border:1px solid var(--ln);border-radius:12px;max-height:72vh}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px}
+th{background:var(--sf2);text-align:right;padding:8px 10px;font-weight:600;white-space:nowrap;position:sticky;top:0;z-index:2;border-bottom:1px solid var(--ln);font-family:"Plus Jakarta Sans",sans-serif;color:var(--mu)}
+tr.gr th{top:0;height:29px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;border-bottom:0}
+tr.gr+tr th{top:29px}
+th.g-mom{background:var(--mom);color:var(--momI)}th.g-shr{background:var(--shr);color:var(--shrI)}th.g-tor{background:var(--tor);color:var(--torI)}th.g-reb{background:var(--reb);color:var(--rebI)}th.g-sti{background:var(--sti);color:var(--stiI)}
+th:first-child,td.l{text-align:left}
+td{padding:8px 10px;border-bottom:1px solid var(--ln);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;font-size:12.5px}
+td.l{font-family:"Plus Jakarta Sans",sans-serif;font-weight:600}
+td.t{font-family:"Plus Jakarta Sans",sans-serif;color:var(--mu)}
+td:first-child,th:first-child{position:sticky;left:0;z-index:1;background:var(--sf)}
+th:first-child{z-index:3;background:var(--sf2)}
+tbody tr:hover td{background:var(--pr2)}
+tbody tr:last-child td{border-bottom:0}
+td.mx{color:var(--pr);font-weight:700}
+td.mx::after{content:"▲";font-size:8px;margin-left:4px;vertical-align:2px;color:var(--ac)}
+td.dim{color:var(--mu)}
+td.need{font-family:"Plus Jakarta Sans",sans-serif;color:var(--stiI);font-weight:600}
+.grp{border:1px solid var(--ln);border-radius:12px;margin-bottom:14px;overflow:hidden;background:var(--sf)}
+.gh{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--sf2);border-bottom:1px solid var(--ln)}
+.gh h3{margin:0;font-size:15.5px;display:flex;gap:8px;align-items:center}
+.badge{font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;text-transform:uppercase;letter-spacing:.4px}
+.badge.balok{background:var(--mom);color:var(--momI)}.badge.kolom{background:var(--reb);color:var(--rebI)}
+.gh .meta{font-size:12px;color:var(--mu);margin-top:3px}
+.warn{color:var(--wr);font-size:12px;margin-top:4px;font-weight:600}
+.gctl{display:flex;gap:6px;flex:none}
+.gctl select{width:auto}
+.grp .tw{border:0;border-radius:0;max-height:none}
+.sec td{background:var(--sf2)!important;color:var(--mu);font:700 11px "Plus Jakarta Sans",sans-serif;text-transform:uppercase;letter-spacing:.5px;text-align:left;padding:6px 10px}
+.note{font-size:11.5px;color:var(--mu);margin-top:10px}
+.empty{padding:56px 20px;text-align:center}
+.empty svg{color:var(--pr)}
+.empty h2{margin:14px 0 6px;font-size:19px}
+.empty p{color:var(--mu);max-width:520px;margin:0 auto 18px}
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;max-width:820px;margin:28px auto 0;text-align:left}
+.feat div{border:1px solid var(--ln);border-radius:12px;padding:12px 14px;background:var(--sf2);font-size:12.5px;color:var(--mu)}
+.feat b{display:block;color:var(--ink);font-size:13px;margin-bottom:2px}
+footer{max-width:1480px;margin:auto;padding:18px 28px 30px;border-top:1px solid var(--ln);color:var(--mu);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:var(--sh)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:640px){.nav,.heroIn,.layout,footer{padding-left:14px;padding-right:14px}.search input{width:100%}.search{width:100%}.fg,.presets{grid-template-columns:1fr}}
+@media print{.hero,aside,.tools,.rhead .search,footer{display:none}.layout{display:block;margin:0}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="nav">
+    <div class="logo">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none"><rect width="34" height="34" rx="9" fill="#f59e0b"/><path d="M7 11h20M7 23h20M11 11v12M23 11v12" stroke="#1b1300" stroke-width="2.4" stroke-linecap="round"/><path d="M11 17l6-4 6 4" stroke="#1b1300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>SortirSAP<small>Rekap gaya dalam &amp; tulangan SAP2000</small></div>
+    </div>
+    <span class="sp"></span>
+    <a class="ibtn" href="https://sipilbelajar.netlify.app/" style="text-decoration:none"><span>SipilBelajar</span></a>
+    <a class="ibtn" href="https://sipilbelajar.netlify.app/kalkulator/" style="text-decoration:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg><span>Kalkulator lain</span></a>
+    <button class="ibtn" id="themeBtn" title="Ganti tema"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span>Tema</span></button>
+  </div>
+  <div class="heroIn">
+    <h1>Nilai <em>Mu, Pu, Vu</em> &amp; tulangan maksimum<br>dari output SAP2000, dalam hitungan detik.</h1>
+    <p>Unggah tabel export SAP2000, pilih kombinasi beban, dan dapatkan rekap nilai terbesar per penampang balok dan kolom — lengkap dengan kombinasi, frame, dan lokasinya — siap diinput ke perhitungan manual.</p>
+    <div class="steps">
+      <div class="step"><b>1</b>Export tabel dari SAP2000</div>
+      <div class="step"><b>2</b>Unggah &amp; atur satuan</div>
+      <div class="step"><b>3</b>Salin / unduh rekap</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <section class="card">
+      <div class="chead"><span class="n">1</span>Data SAP2000</div>
+      <div class="cbody">
+        <div id="drop">
+          <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></div>
+          <b>Klik atau seret file ke sini</b>
+          <span>.xlsx · .xls · .csv · .txt · .s2k — bisa beberapa file</span>
+        </div>
+        <input type="file" id="file" multiple accept=".xlsx,.xls,.xlsm,.csv,.txt,.s2k,.$2k,.tsv" hidden>
+        <textarea id="paste" placeholder="…atau tempel tabel dari Excel/SAP2000 (sertakan baris judul kolom)"></textarea>
+        <div class="bar mt"><button class="btn gh sm" id="btnPaste">Proses tempelan</button><button class="btn gh sm" id="btnDemo">Coba data contoh</button><span style="flex:1"></span><button class="btn gh sm" id="btnReset">Reset</button></div>
+        <div id="status" class="status"></div>
+        <div id="fileList"></div>
+      </div>
+    </section>
+
+    <details class="card acc" open>
+      <summary class="chead"><span class="n">2</span>Satuan hasil<span class="sp"></span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="cbody">
+        <div class="presets">
+          <button class="preset" data-preset="kN,m,mm,mm/m"><b>kN · kN·m</b><span>As mm² · Av/s mm²/m</span></button>
+          <button class="preset" data-preset="N,mm,mm,mm/mm"><b>N · N·mm</b><span>As mm² · Av/s mm²/mm</span></button>
+          <button class="preset" data-preset="kgf,cm,cm,cm/m"><b>kgf · kgf·cm</b><span>As cm² · Av/s cm²/m</span></button>
+          <button class="preset" data-preset="tonf,m,cm,cm/m"><b>ton · ton·m</b><span>As cm² · Av/s cm²/m</span></button>
+        </div>
+        <div class="fg">
+          <label class="f">Gaya (P, V)<select id="outF"><option value="kN">kN</option><option value="N">N</option><option value="kgf">kgf</option><option value="tonf">ton (tonf)</option></select></label>
+          <label class="f">Panjang momen (M, T)<select id="outL"><option value="m">m (→ ·m)</option><option value="cm">cm (→ ·cm)</option><option value="mm">mm (→ ·mm)</option></select></label>
+          <label class="f">Luas tulangan As<select id="outA"><option value="mm">mm²</option><option value="cm">cm²</option><option value="m">m²</option></select></label>
+          <label class="f">Tulangan geser Av/s<select id="outAv"><option value="mm/m">mm²/m</option><option value="mm/mm">mm²/mm</option><option value="cm/m">cm²/m</option><option value="m/m">m²/m</option></select></label>
+        </div>
+        <details class="mini"><summary>Satuan sumber (bila tidak terbaca di file)</summary>
+          <div class="fg mt">
+            <label class="f">Gaya di SAP<select id="srcF"><option value="kN">kN</option><option value="N">N</option><option value="kgf">kgf</option><option value="tonf">tonf</option></select></label>
+            <label class="f">Panjang di SAP<select id="srcL"><option value="m">m</option><option value="mm">mm</option><option value="cm">cm</option></select></label>
+            <label class="f w">Luas tulangan di SAP<select id="areaUnit"><option value="m2">m²</option><option value="mm2">mm²</option><option value="cm2">cm²</option></select></label>
+          </div>
+          <div class="hint">Export Excel SAP2000 menyertakan baris satuan (KN, KN-m, m2 …) sehingga biasanya terbaca otomatis.</div>
+        </details>
+      </div>
+    </details>
+
+    <details class="card acc" open>
+      <summary class="chead"><span class="n">3</span>Kombinasi beban<span class="sp"></span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="cbody">
+        <div class="bar" style="margin-bottom:10px"><button class="btn gh sm" id="cComb">Hanya kombinasi</button><button class="btn gh sm" id="cAll">Semua</button><button class="btn gh sm" id="cNone">Kosongkan</button></div>
+        <div id="cases"></div>
+      </div>
+    </details>
+
+    <details class="card acc">
+      <summary class="chead"><span class="n">4</span>Opsi analisis &amp; tulangan<span class="sp"></span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="cbody">
+        <div class="fg">
+          <label class="f w">Kelompokkan per<select id="groupBy"><option value="section">Penampang (AnalSect)</option><option value="frame">Frame (satu per satu)</option></select></label>
+          <label class="f">Zona tumpuan (×L tiap ujung)<input type="number" id="region" value="0.25" step="0.05" min="0" max="0.5"></label>
+          <label class="f">Jumlah desimal<input type="number" id="decimals" value="3" min="0" max="6"></label>
+          <label class="f w">Pemisah desimal<select id="decSep"><option value=".">Titik (1.234)</option><option value=",">Koma (1,234) – Excel Indonesia</option></select></label>
+        </div>
+        <div class="sub2">Perkiraan jumlah tulangan</div>
+        <div class="fg">
+          <label class="f">Tulangan pokok D (mm)<input type="number" id="diaD" value="16"></label>
+          <label class="f">Sengkang Ø (mm)<input type="number" id="diaS" value="10"></label>
+          <label class="f">Jumlah kaki sengkang<input type="number" id="legs" value="2" min="1"></label>
+        </div>
+      </div>
+    </details>
+
+    <details class="card acc help">
+      <summary class="chead"><span class="n">?</span>Cara export dari SAP2000<span class="sp"></span><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="cbody">
+        <ol>
+          <li><b>Display → Show Tables</b> (Ctrl+T), centang:
+            <ul>
+              <li>Analysis Results → Frame Output → <b>Element Forces - Frames</b></li>
+              <li>Model Definition → Frame Assignments → <b>Frame Section Assignments</b></li>
+              <li>Design Data → <b>Concrete Design 1 – Column / Beam Summary</b></li>
+              <li>Opsional: <b>Connectivity - Frame</b> + <b>Joint Coordinates</b> (deteksi balok/kolom otomatis)</li>
+            </ul></li>
+          <li>Pilih kombinasi di <i>Select Load Patterns/Cases</i>.</li>
+          <li><b>File → Export All Tables → To Excel</b>, lalu unggah ke sini.</li>
+        </ol>
+        <div class="hint">Tanpa tabel konektivitas, tipe elemen ditebak dari nama penampang (K…/C…/KOL… = kolom). Bisa diubah di tab Detail.</div>
+      </div>
+    </details>
+  </aside>
+
+  <main>
+    <div id="kpis" class="kpis" hidden></div>
+    <section class="card" id="outCard" hidden>
+      <div class="rhead">
+        <div class="tabs">
+          <button class="tab on" data-tab="balok" id="tabB">Rekap Balok</button>
+          <button class="tab" data-tab="kolom" id="tabK">Rekap Kolom</button>
+          <button class="tab" data-tab="detail" id="tabD">Detail</button>
+        </div>
+        <span class="sp"></span>
+        <label class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="search" id="search" placeholder="Cari penampang / no. frame"></label>
+      </div>
+      <div class="rbody" id="out"></div>
+    </section>
+    <section class="card" id="emptyCard">
+      <div class="empty">
+        <svg width="120" height="84" viewBox="0 0 120 84" fill="none"><rect x="6" y="14" width="108" height="10" rx="3" fill="currentColor" opacity=".18"/><rect x="14" y="24" width="10" height="54" rx="3" fill="currentColor" opacity=".3"/><rect x="96" y="24" width="10" height="54" rx="3" fill="currentColor" opacity=".3"/><path d="M24 30c18 22 54 22 72 0" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="4 4" fill="none"/><path d="M60 4v8M56 8l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <h2>Belum ada data yang diolah</h2>
+        <p>Unggah file export SAP2000 di panel kiri, atau coba dulu dengan data contoh portal sederhana untuk melihat hasilnya.</p>
+        <button class="btn acc" id="btnDemo2">Coba data contoh</button>
+        <div class="feat">
+          <div><b>Balok: tumpuan &amp; lapangan</b>Mu⁻/Mu⁺ dan Vu dipisah per zona, lengkap dengan As atas/bawah dan Av/s.</div>
+          <div><b>Kolom: gaya berpasangan</b>Pu maks dengan M3/M2 terkait, dan Mu maks dengan P terkait — untuk diagram interaksi.</div>
+          <div><b>Bebas pilih satuan</b>kN·m, N·mm, kgf·cm, ton·m; luas mm² atau cm². Satuan SAP terbaca otomatis.</div>
+          <div><b>Data tetap di perangkat</b>File diproses di browser Anda, tidak diunggah ke server mana pun.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<footer>
+  <div><b style="color:var(--ink)">© <span id="yr">2026</span> Jauhari</b> · SortirSAP — bagian dari <a href="https://sipilbelajar.netlify.app">SipilBelajar</a>. Hak cipta dilindungi.</div>
+  <div>Alat bantu rekap output SAP2000 (SNI 2847:2019). Selalu verifikasi hasil terhadap model SAP2000 Anda.</div>
+</footer>
+<div class="toast" id="toast"></div>
+<script>
+/* SortirSAP © 2026 Jauhari — https://sipilbelajar.netlify.app */
+/* ===== CORE: parsing & analisis output SAP2000 ===== */
+const Core = (() => {
+  const N = s => String(s ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const S = v => String(v ?? '').trim();
+  function num(v) {
+    if (typeof v === 'number') return v;
+    if (v == null) return NaN;
+    let s = String(v).trim();
+    if (s === '') return NaN;
+    if (s.includes(',') && !s.includes('.')) s = s.replace(',', '.');
+    return Number(s);
+  }
+
+  const KNOWN = ['outputcase', 'analsect', 'pmmarea', 'ftoparea', 'fbotarea', 'jointi', 'xorr', 'globalx', 'designsect', 'station'];
+  function isHeaderRow(r) {
+    if (!r || !r.length) return false;
+    const c = r.map(N);
+    return (c.includes('frame') || c.includes('joint')) && c.some(x => KNOWN.includes(x));
+  }
+  function isUnitsRow(r) {
+    if (!r || !r.length) return false;
+    if (N(r[0]) === 'text') return true;
+    return !r.some(x => typeof x === 'number') &&
+      r.some(x => /^(kn|kgf|tonf|n|kip|lb)(-?(m|mm|cm|ft|in))?$/i.test(S(x)));
+  }
+
+  // rows = array of arrays (dari sheet Excel / paste / CSV)
+  function tablesFromRows(rows, fallback) {
+    const out = []; let name = fallback || ''; let i = 0;
+    while (i < rows.length) {
+      const r = rows[i] || [];
+      const m = S(r[0]).match(/^TABLE:\s*"?(.*?)"?\s*$/i);
+      if (m) { name = m[1].trim(); i++; continue; }
+      if (isHeaderRow(r)) {
+        const keys = r.map(N), header = r.map(S), units = {};
+        let j = i + 1;
+        if (isUnitsRow(rows[j])) { rows[j].forEach((u, k) => { if (keys[k]) units[keys[k]] = S(u); }); j++; }
+        const data = [];
+        for (; j < rows.length; j++) {
+          const rr = rows[j]; if (!rr) continue;
+          if (/^TABLE:/i.test(S(rr[0])) || isHeaderRow(rr)) break;
+          if (rr.every(x => x === '' || x == null)) continue;
+          const o = {}; keys.forEach((k, idx) => { if (k && !(k in o)) o[k] = rr[idx]; });
+          data.push(o);
+        }
+        out.push({ name, keys, header, units, rows: data });
+        i = j; continue;
+      }
+      i++;
+    }
+    return out;
+  }
+
+  // Format teks SAP2000 (.s2k / .$2k): TABLE: "..." lalu baris Key=Value
+  function isKV(text) { return /^\s*TABLE:/m.test(text) && /\b[A-Za-z0-9_]+=\S/.test(text) && !/\t/.test(text.slice(0, 5000)); }
+  function parseKV(text) {
+    const lines = text.replace(/\r/g, '').split('\n'); const out = []; let cur = null; let buf = '';
+    const re = /([A-Za-z0-9_]+)=("([^"]*)"|[^\s]+)/g;
+    for (const raw of lines) {
+      let line = buf + raw;
+      if (/\s_\s*$/.test(line)) { buf = line.replace(/\s_\s*$/, ' '); continue; }
+      buf = '';
+      const t = line.trim(); if (!t) continue;
+      const m = t.match(/^TABLE:\s*"?(.*?)"?\s*$/i);
+      if (m) { cur = { name: m[1], keys: [], header: [], units: {}, rows: [] }; out.push(cur); continue; }
+      if (!cur) continue;
+      const o = {}; let mm, any = false; re.lastIndex = 0;
+      while ((mm = re.exec(t))) {
+        const k = N(mm[1]); o[k] = mm[3] !== undefined ? mm[3] : mm[2]; any = true;
+        if (!cur.keys.includes(k)) { cur.keys.push(k); cur.header.push(mm[1]); }
+      }
+      if (any) cur.rows.push(o);
+    }
+    let units = null;
+    const pc = out.find(t => /program control/i.test(t.name));
+    if (pc && pc.rows[0] && pc.rows[0].currunits) units = String(pc.rows[0].currunits).split(',').map(s => s.trim());
+    if (units) {
+      const [fu, lu] = units;
+      const map = { p: fu, v2: fu, v3: fu, t: fu + '-' + lu, m2: fu + '-' + lu, m3: fu + '-' + lu, station: lu, location: lu,
+        pmmarea: lu + '2', ftoparea: lu + '2', fbotarea: lu + '2', tlngarea: lu + '2',
+        vmajrebar: lu + '2/' + lu, vminrebar: lu + '2/' + lu, vrebar: lu + '2/' + lu, ttrnrebar: lu + '2/' + lu };
+      out.forEach(t => t.keys.forEach(k => { if (map[k] && !t.units[k]) t.units[k] = map[k]; }));
+    }
+    return out;
+  }
+
+  function splitDelimited(text) {
+    const lines = text.replace(/\r/g, '').split('\n');
+    const sample = lines.slice(0, 20).join('\n');
+    const d = sample.includes('\t') ? '\t' : (sample.split(';').length > sample.split(',').length ? ';' : ',');
+    return lines.map(l => {
+      if (d === '\t') return l.split('\t');
+      const res = []; let cur = '', q = false;
+      for (let i = 0; i < l.length; i++) {
+        const ch = l[i];
+        if (q) { if (ch === '"') { if (l[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+        else if (ch === '"') q = true; else if (ch === d) { res.push(cur); cur = ''; } else cur += ch;
+      }
+      res.push(cur); return res;
+    });
+  }
+  function tablesFromText(text, fallback) {
+    return isKV(text) ? parseKV(text) : tablesFromRows(splitDelimited(text), fallback);
+  }
+
+  function typeOf(t) {
+    const k = new Set(t.keys); const h = x => k.has(x);
+    if (h('frame') && h('station') && h('outputcase') && h('p') && (h('m3') || h('v2'))) return 'forces';
+    if (h('frame') && h('pmmarea')) return 'coldes';
+    if (h('frame') && (h('ftoparea') || h('fbotarea'))) return 'beamdes';
+    if (h('frame') && h('analsect')) return 'sect';
+    if (h('frame') && h('jointi') && h('jointj')) return 'conn';
+    if (h('joint') && (h('xorr') || h('globalx'))) return 'joints';
+    return null;
+  }
+  const TYPE_LABEL = { forces: 'Gaya dalam frame (Element Forces - Frames)', coldes: 'Desain beton kolom (Column Summary)',
+    beamdes: 'Desain beton balok (Beam Summary)', sect: 'Penampang frame (Frame Section Assignments)',
+    conn: 'Konektivitas frame (Connectivity - Frame)', joints: 'Koordinat joint (Joint Coordinates)' };
+
+  function buildModel(tables) {
+    const M = {}; const info = [];
+    tables.forEach(t => {
+      const ty = typeOf(t);
+      info.push({ name: t.name, type: ty, n: t.rows.length });
+      if (!ty) return;
+      if (!M[ty]) M[ty] = { rows: [], units: {} };
+      M[ty].rows.push(...t.rows);
+      Object.assign(M[ty].units, t.units);
+    });
+    return { M, info };
+  }
+
+  function listCases(M) {
+    const map = new Map();
+    (M.forces?.rows || []).forEach(r => { const c = S(r.outputcase); if (!map.has(c)) map.set(c, S(r.casetype)); });
+    return [...map.entries()].map(([name, type]) => ({ name, type }));
+  }
+
+  function guessType(name) {
+    const n = S(name).toUpperCase();
+    if (/^(K|C|KOL|COL|KP|KS)/.test(n)) return 'kolom';
+    return 'balok';
+  }
+
+  // Konversi satuan luas tulangan ke mm² (atau mm²/m)
+  function areaConv(u, fallback) {
+    const n = N(u || fallback);
+    const T = { m2: [1e6, 'mm²'], cm2: [100, 'mm²'], mm2: [1, 'mm²'], m2m: [1e6, 'mm²/m'], cm2m: [100, 'mm²/m'],
+      mm2m: [1, 'mm²/m'], mm2mm: [1000, 'mm²/m'], cm2cm: [1e4, 'mm²/m'] };
+    return T[n] ? { f: T[n][0], u: T[n][1] } : { f: 1, u: u || fallback || '' };
+  }
+
+  function up(acc, k, v, row, mode) {
+    if (!isFinite(v)) return;
+    const cmp = mode === 'max' ? v : mode === 'min' ? -v : Math.abs(v);
+    const cur = acc[k];
+    if (!cur || cmp > cur.cmp) acc[k] = { v, cmp, row };
+  }
+
+  function analyze(M, opt) {
+    opt = Object.assign({ groupBy: 'section', region: 0.25, cases: null, override: {} }, opt || {});
+    const secOf = {};
+    (M.sect?.rows || []).forEach(r => secOf[S(r.frame)] = S(r.analsect || r.designsect));
+    [M.coldes, M.beamdes].forEach(t => t && t.rows.forEach(r => {
+      const f = S(r.frame); if (!secOf[f] && S(r.designsect)) secOf[f] = S(r.designsect);
+    }));
+    const len = {}, orient = {};
+    if (M.conn) {
+      const J = {};
+      (M.joints?.rows || []).forEach(r => J[S(r.joint)] = [num(r.globalx ?? r.xorr), num(r.globaly ?? r.y), num(r.globalz ?? r.z)]);
+      M.conn.rows.forEach(r => {
+        const f = S(r.frame); const L = num(r.length); if (L > 0) len[f] = L;
+        const a = J[S(r.jointi)], b = J[S(r.jointj)];
+        if (a && b) {
+          const dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2], l = Math.hypot(dx, dy, dz);
+          if (!(len[f] > 0) && l > 0) len[f] = l;
+          if (l > 0 && isFinite(dz)) orient[f] = Math.abs(dz) / l > 0.7 ? 'kolom' : 'balok';
+        }
+      });
+    }
+    const maxSt = {};
+    (M.forces?.rows || []).forEach(r => { const f = S(r.frame), s = num(r.station); if (isFinite(s) && !(maxSt[f] >= s)) maxSt[f] = s; });
+    const locMax = {};
+    [M.coldes, M.beamdes].forEach(t => t && t.rows.forEach(r => { const f = S(r.frame), s = num(r.location); if (isFinite(s) && !(locMax[f] >= s)) locMax[f] = s; }));
+    const Lof = f => len[f] > 0 ? len[f] : (maxSt[f] > 0 ? maxSt[f] : (locMax[f] || 0));
+    const gk = f => opt.groupBy === 'frame' ? f : (secOf[f] || '(tanpa penampang)');
+    const reg = opt.region, eps = 1e-6;
+    const isTump = (s, L) => !(L > 0) ? true : (s <= reg * L + eps || s >= (1 - reg) * L - eps);
+
+    const G = new Map();
+    const grp = f => {
+      const k = gk(f);
+      if (!G.has(k)) G.set(k, { key: k, frames: new Set(), votes: { kolom: 0, balok: 0 }, acc: {}, des: {}, hasCol: false, hasBeam: false, warn: 0, warnFrames: new Set() });
+      const g = G.get(k);
+      if (!g.frames.has(f)) { g.frames.add(f); if (orient[f]) g.votes[orient[f]]++; }
+      return g;
+    };
+    const cases = opt.cases;
+    (M.forces?.rows || []).forEach(r => {
+      const c = S(r.outputcase);
+      if (cases && !cases.has(c)) return;
+      const f = S(r.frame), g = grp(f), s = num(r.station), L = Lof(f), t = isTump(s, L);
+      const P = num(r.p), V2 = num(r.v2), V3 = num(r.v3), T = num(r.t), M2 = num(r.m2), M3 = num(r.m3);
+      const row = { f, s, c, st: S(r.steptype), P, V2, V3, T, M2, M3, L, z: t ? 'Tumpuan' : 'Lapangan' };
+      const a = g.acc;
+      if (t) { up(a, 'MnT', M3, row, 'min'); up(a, 'MpT', M3, row, 'max'); up(a, 'VT', V2, row, 'abs'); }
+      else { up(a, 'MpL', M3, row, 'max'); up(a, 'MnL', M3, row, 'min'); up(a, 'VL', V2, row, 'abs'); }
+      up(a, 'T', T, row, 'abs'); up(a, 'Pc', P, row, 'min'); up(a, 'Pt', P, row, 'max');
+      up(a, 'M3', M3, row, 'abs'); up(a, 'M2', M2, row, 'abs'); up(a, 'V2', V2, row, 'abs'); up(a, 'V3', V3, row, 'abs');
+      up(a, 'Pabs', P, row, 'abs');
+    });
+    const flag = (g, r) => { const st = S(r.status || r.errmsg || r.warnmsg); if (st && !/^no\s*message/i.test(st) && !/^ok$/i.test(st)) { g.warn++; g.warnFrames.add(S(r.frame)); } };
+    (M.coldes?.rows || []).forEach(r => {
+      const f = S(r.frame), g = grp(f); g.hasCol = true; flag(g, r);
+      const base = { f, s: num(r.location) };
+      up(g.des, 'PMM', num(r.pmmarea), { ...base, c: S(r.pmmcombo) }, 'max');
+      up(g.des, 'Ratio', num(r.pmmratio), { ...base, c: S(r.pmmcombo) }, 'max');
+      up(g.des, 'VMaj', num(r.vmajrebar), { ...base, c: S(r.vmajcombo) }, 'max');
+      up(g.des, 'VMin', num(r.vminrebar), { ...base, c: S(r.vmincombo) }, 'max');
+    });
+    (M.beamdes?.rows || []).forEach(r => {
+      const f = S(r.frame), g = grp(f); g.hasBeam = true; flag(g, r);
+      const s = num(r.location), L = Lof(f), t = isTump(s, L), Z = t ? 'T' : 'L';
+      const base = { f, s, z: t ? 'Tumpuan' : 'Lapangan' };
+      up(g.des, 'Top' + Z, num(r.ftoparea), { ...base, c: S(r.ftopcombo) }, 'max');
+      up(g.des, 'Bot' + Z, num(r.fbotarea), { ...base, c: S(r.fbotcombo) }, 'max');
+      up(g.des, 'Av' + Z, num(r.vrebar), { ...base, c: S(r.vrebarcombo) }, 'max');
+      up(g.des, 'TL', num(r.tlngarea), { ...base, c: S(r.tlngcombo) }, 'max');
+      up(g.des, 'TT', num(r.ttrnrebar), { ...base, c: S(r.ttrncombo) }, 'max');
+    });
+    const groups = [...G.values()].map(g => {
+      const nameForGuess = opt.groupBy === 'frame' ? (secOf[g.key] || g.key) : g.key;
+      let auto = g.votes.kolom || g.votes.balok ? (g.votes.kolom >= g.votes.balok ? 'kolom' : 'balok')
+        : g.hasCol && !g.hasBeam ? 'kolom' : g.hasBeam && !g.hasCol ? 'balok' : guessType(nameForGuess);
+      g.auto = auto; g.type = opt.override[g.key] || auto;
+      g.frameList = [...g.frames].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      g.section = opt.groupBy === 'frame' ? (secOf[g.key] || '') : g.key;
+      return g;
+    }).sort((a, b) => a.key.localeCompare(b.key, undefined, { numeric: true }));
+    return { groups, hasForces: !!M.forces, hasCol: !!M.coldes, hasBeam: !!M.beamdes, hasSect: !!M.sect, hasOrient: Object.keys(orient).length > 0 };
+  }
+
+  return { N, num, tablesFromRows, tablesFromText, buildModel, listCases, analyze, areaConv, TYPE_LABEL, typeOf };
+})();
+if (typeof module !== 'undefined') module.exports = Core;
+
+/* ===== DATA CONTOH (meniru format export Excel SAP2000) ===== */
+function makeDemo() {
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const cases = [['DEAD', 'LinStatic', 1, 0, 0], ['LIVE', 'LinStatic', 0, 1, 0], ['COMB1', 'Combination', 1.4, 0, 0],
+    ['COMB2', 'Combination', 1.2, 1.6, 0], ['COMB3', 'Combination', 1.2, 1, 1], ['COMB4', 'Combination', 1.2, 1, -1],
+    ['COMB5', 'Combination', 0.9, 0, 1]];
+  const r3 = x => Math.round(x * 1000) / 1000;
+  const F = [['TABLE:  Element Forces - Frames'],
+    ['Frame', 'Station', 'OutputCase', 'CaseType', 'StepType', 'P', 'V2', 'V3', 'T', 'M2', 'M3', 'FrameElem', 'ElemStation'],
+    ['Text', 'm', 'Text', 'Text', 'Text', 'KN', 'KN', 'KN', 'KN-m', 'KN-m', 'KN-m', 'Text', 'm']];
+  const SA = [['TABLE:  Frame Section Assignments'], ['Frame', 'SectionType', 'AutoSelect', 'AnalSect', 'DesignSect', 'MatProp'], ['Text', 'Text', 'Text', 'Text', 'Text', 'Text']];
+  const CD = [['TABLE:  Concrete Design 1 - Column Summary - SNI 2847:2019'],
+    ['Frame', 'DesignSect', 'DesignType', 'Status', 'Location', 'PMMCombo', 'PMMArea', 'PMMRatio', 'VMajCombo', 'VMajRebar', 'VMinCombo', 'VMinRebar'],
+    ['Text', 'Text', 'Text', 'Text', 'm', 'Text', 'm2', 'Unitless', 'Text', 'm2/m', 'Text', 'm2/m']];
+  const BD = [['TABLE:  Concrete Design 1 - Beam Summary - SNI 2847:2019'],
+    ['Frame', 'DesignSect', 'DesignType', 'Status', 'Location', 'FTopCombo', 'FTopArea', 'FBotCombo', 'FBotArea', 'VRebarCombo', 'VRebar', 'TLngCombo', 'TLngArea', 'TTrnCombo', 'TTrnRebar'],
+    ['Text', 'Text', 'Text', 'Text', 'm', 'Text', 'm2', 'Text', 'm2', 'Text', 'm2/m', 'Text', 'm2', 'Text', 'm2/m']];
+  const frames = [];
+  for (let i = 1; i <= 6; i++) frames.push({ id: String(i), sec: 'K1 40x40', kind: 'k', L: 4, N: 620 + 120 * rnd(), Me: 55 + 25 * rnd() });
+  for (let i = 7; i <= 8; i++) frames.push({ id: String(i), sec: 'K2 30x30', kind: 'k', L: 4, N: 260 + 60 * rnd(), Me: 25 + 10 * rnd() });
+  for (let i = 9; i <= 14; i++) frames.push({ id: String(i), sec: 'B1 30x50', kind: 'b', L: 5, wd: 22 + 4 * rnd(), wl: 9 + 2 * rnd(), Me: 40 + 15 * rnd() });
+  for (let i = 15; i <= 17; i++) frames.push({ id: String(i), sec: 'B2 25x40', kind: 'b', L: 3, wd: 14 + 3 * rnd(), wl: 6 + rnd(), Me: 18 + 6 * rnd() });
+  frames.forEach(fr => {
+    SA.push([fr.id, 'Rectangular', 'N.A.', fr.sec, fr.sec, 'fc25']);
+    const st = fr.kind === 'k' ? [0, 2, 4] : [0, fr.L / 4, fr.L / 2, 3 * fr.L / 4, fr.L];
+    cases.forEach(([c, ct, kd, kl, ke]) => st.forEach(x => {
+      let P, V2, V3, T, M2, M3;
+      if (fr.kind === 'k') {
+        const g = kd * 0.7 + kl * 0.3;
+        P = -fr.N * g - 5 * ke; M3 = (fr.Me * ke + 8 * g) * (1 - 2 * x / fr.L); M2 = (0.35 * fr.Me * ke + 4 * g) * (1 - 2 * x / fr.L);
+        V2 = -2 * (fr.Me * ke + 8 * g) / fr.L; V3 = -2 * (0.35 * fr.Me * ke + 4 * g) / fr.L; T = 0.3 * ke;
+      } else {
+        const w = kd * fr.wd + kl * fr.wl, L = fr.L;
+        M3 = w * L * x / 2 - w * x * x / 2 - w * L * L / 12 + ke * fr.Me * (1 - 2 * x / L);
+        V2 = -(w * (L / 2 - x) - 2 * ke * fr.Me / L); P = -2 * ke; V3 = 0.4 * ke; M2 = 0.2 * ke; T = 1.5 * (kd + kl) + 0.5 * ke;
+      }
+      F.push([fr.id, x, c, ct, '', r3(P), r3(V2), r3(V3), r3(T), r3(M2), r3(M3), fr.id, x]);
+    }));
+    if (fr.kind === 'k') {
+      const As = fr.sec.startsWith('K1') ? 0.0016 + 0.0012 * rnd() : 0.0009 + 0.0004 * rnd();
+      [0, fr.L].forEach(x => CD.push([fr.id, fr.sec, 'Column', 'No Messages', x, 'COMB3', r3(As * 1e6) / 1e6, r3(0.55 + 0.3 * rnd()), 'COMB3', r3(0.00035 * 1e6 * (1 + 0.2 * rnd())) / 1e6, 'COMB4', r3(0.00028 * 1e6) / 1e6]));
+    } else {
+      const big = fr.sec.startsWith('B1');
+      [0, fr.L / 4, fr.L / 2, 3 * fr.L / 4, fr.L].forEach(x => {
+        const end = x === 0 || x === fr.L, mid = x === fr.L / 2;
+        const top = (big ? 950 : 420) * (end ? 1 : mid ? 0.35 : 0.6) * (1 + 0.15 * rnd());
+        const bot = (big ? 610 : 280) * (mid ? 1 : end ? 0.55 : 0.85) * (1 + 0.15 * rnd());
+        const av = (big ? 520 : 330) * (end ? 1 : mid ? 0.4 : 0.7) * (1 + 0.1 * rnd());
+        BD.push([fr.id, fr.sec, 'Beam', fr.id === '12' && end ? 'O/S #2' : 'No Messages', x, 'COMB3', r3(top) / 1e6, 'COMB2', r3(bot) / 1e6, 'COMB3', r3(av) / 1e6, 'COMB2', 0, 'COMB2', 0]);
+      });
+    }
+  });
+  return [{ name: 'Element Forces - Frames', rows: F }, { name: 'Frame Section Assignments', rows: SA },
+    { name: 'Column Summary', rows: CD }, { name: 'Beam Summary', rows: BD }];
+}
+if (typeof module !== 'undefined') module.exports = makeDemo;
+
+/* ===== UI ===== */
+const $ = s => document.querySelector(s);
+const st = { files: [], caseSel: null, override: {}, tab: 'balok', q: '' };
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function opts() {
+  return {
+    groupBy: $('#groupBy').value,
+    region: Math.min(0.5, Math.max(0, parseFloat($('#region').value) || 0.25)),
+    areaUnit: $('#areaUnit').value,
+    comma: $('#decSep').value === ',',
+    dec: parseInt($('#decimals').value) || 3,
+    D: parseFloat($('#diaD').value) || 16,
+    ds: parseFloat($('#diaS').value) || 10,
+    legs: parseFloat($('#legs').value) || 2,
+    outF: $('#outF').value, outL: $('#outL').value, outA: $('#outA').value, outAv: $('#outAv').value,
+    srcF: $('#srcF').value, srcL: $('#srcL').value,
+  };
+}
+function fmt(v, d) {
+  const o = opts(); if (v == null || !isFinite(v)) return '–';
+  const s = (+v).toFixed(d ?? o.dec);
+  return o.comma ? s.replace('.', ',') : s;
+}
+
+/* ---- satuan ---- */
+const FORCE = { n: 1, kn: 1e3, mn: 1e6, kgf: 9.80665, kg: 9.80665, tonf: 9806.65, ton: 9806.65, t: 9806.65, kip: 4448.2216, lb: 4.4482216, lbf: 4.4482216 };
+const LEN = { m: 1, mm: 1e-3, cm: 1e-2, ft: 0.3048, in: 0.0254 };
+const pForce = (u, fb) => FORCE[Core.N(u)] ?? FORCE[Core.N(fb)] ?? 1;
+const pLen = (u, fb) => LEN[Core.N(u)] ?? LEN[Core.N(fb)] ?? 1;
+function pMoment(u, fbF, fbL) {
+  const p = String(u || '').trim().split(/[-·.*\s]+/).filter(Boolean);
+  if (p.length >= 2 && FORCE[Core.N(p[0])] != null && LEN[Core.N(p[1])] != null) return FORCE[Core.N(p[0])] * LEN[Core.N(p[1])];
+  return pForce(fbF) * pLen(fbL);
+}
+// luas → m² ; luas per panjang → m²/m
+function pArea(u, fbArea, perFb) {
+  const re = /^\s*(mm|cm|m|in|ft)\s*(?:2|²|\^2)\s*(?:\/\s*(mm|cm|m|in|ft))?\s*$/i;
+  let m = String(u || '').match(re);
+  if (!m) m = String(fbArea + (perFb ? '/' + perFb : '')).match(re);
+  if (!m) return 1;
+  return LEN[m[1].toLowerCase()] ** 2 / (m[2] ? LEN[m[2].toLowerCase()] : 1);
+}
+
+function setStatus(msg, kind) { const el = $('#status'); el.textContent = msg; el.className = 'status ' + (kind || ''); }
+
+async function readFiles(fileList) {
+  for (const file of fileList) {
+    try {
+      const ext = file.name.split('.').pop().toLowerCase();
+      let tables = [];
+      if (['xlsx', 'xls', 'xlsm', 'ods'].includes(ext)) {
+        if (typeof XLSX === 'undefined') throw new Error('Pustaka pembaca Excel belum termuat. Periksa koneksi internet, atau simpan tabel sebagai CSV/TXT.');
+        const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+        wb.SheetNames.forEach(sn => {
+          const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: true, defval: '' });
+          tables.push(...Core.tablesFromRows(rows, sn));
+        });
+      } else {
+        tables = Core.tablesFromText(await file.text(), file.name);
+      }
+      st.files.push({ name: file.name, tables });
+    } catch (e) { setStatus('Gagal membaca ' + file.name + ': ' + e.message, 'err'); }
+  }
+  refresh();
+}
+
+function loadPaste() {
+  const txt = $('#paste').value; if (!txt.trim()) return;
+  st.files.push({ name: 'Tempelan #' + (st.files.filter(f => f.name.startsWith('Tempelan')).length + 1), tables: Core.tablesFromText(txt, 'Tempelan') });
+  $('#paste').value = ''; refresh();
+}
+function loadDemo() {
+  const tables = []; makeDemo().forEach(s => tables.push(...Core.tablesFromRows(s.rows, s.name)));
+  st.files.push({ name: 'Data contoh (portal 2D sederhana)', tables }); refresh();
+}
+
+let model = null, result = null, units = {};
+function refresh() {
+  const all = st.files.flatMap(f => f.tables);
+  const { M, info } = Core.buildModel(all); model = M;
+  // daftar file & tabel terdeteksi
+  $('#fileList').innerHTML = st.files.map((f, i) => `
+    <div class="file"><div class="fh"><span>${esc(f.name)}</span><button class="x" data-rm="${i}" title="Hapus file">✕</button></div>
+      ${f.tables.length ? f.tables.map(t => { const ty = Core.typeOf(t); return `<div class="tb ${ty ? 'ok' : 'skip'}"><i class="d"></i><div>${esc(ty ? Core.TYPE_LABEL[ty] : (t.name || '(tanpa nama)'))} <span>· ${t.rows.length.toLocaleString('id-ID')} baris${ty ? '' : ' · tidak dipakai'}</span></div></div>`; }).join('')
+      : '<div class="tb skip"><i class="d"></i>Tidak ada tabel SAP2000 yang dikenali.</div>'}
+    </div>`).join('');
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { st.files.splice(+b.dataset.rm, 1); refresh(); });
+  if (!st.files.length) setStatus('');
+  else if (!M.forces && !M.coldes && !M.beamdes) setStatus('Tabel gaya dalam / desain beton belum ditemukan. Pastikan tabel "Element Forces - Frames" atau "Concrete Design" ikut diekspor.', 'err');
+  else setStatus('✓ Data siap: ' + [M.forces && 'gaya dalam', M.coldes && 'desain kolom', M.beamdes && 'desain balok', M.sect && 'penampang', M.conn && 'konektivitas'].filter(Boolean).join(', ') + ' terbaca.', 'ok');
+  renderCases(); compute();
+}
+
+function renderCases() {
+  const cases = model ? Core.listCases(model) : [];
+  const box = $('#cases');
+  if (!cases.length) { box.innerHTML = '<span class="hint">Daftar load case/kombinasi muncul setelah tabel gaya dalam dimuat.</span>'; return; }
+  if (!st.caseSel) {
+    const combos = cases.filter(c => /comb/i.test(c.type));
+    st.caseSel = new Set((combos.length ? combos : cases).map(c => c.name));
+  }
+  box.innerHTML = cases.map(c => `<label class="chk"><input type="checkbox" data-case="${esc(c.name)}" ${st.caseSel.has(c.name) ? 'checked' : ''}> ${esc(c.name)} <small>${esc(c.type)}</small></label>`).join('');
+  box.querySelectorAll('[data-case]').forEach(cb => cb.onchange = () => { cb.checked ? st.caseSel.add(cb.dataset.case) : st.caseSel.delete(cb.dataset.case); compute(); });
+}
+function selCases(mode) {
+  const cases = model ? Core.listCases(model) : [];
+  st.caseSel = new Set(mode === 'all' ? cases.map(c => c.name) : mode === 'comb' ? cases.filter(c => /comb/i.test(c.type)).map(c => c.name) : []);
+  renderCases(); compute();
+}
+
+function compute() {
+  if (!model || (!model.forces && !model.coldes && !model.beamdes)) { $('#out').innerHTML = ''; $('#outCard').hidden = true; $('#kpis').hidden = true; $('#emptyCard').hidden = false; return; }
+  const o = opts();
+  result = Core.analyze(model, { groupBy: o.groupBy, region: o.region, cases: model.forces ? st.caseSel : null, override: st.override });
+  const fu = model.forces?.units || {};
+  const cu = model.coldes?.units || {}, bu = model.beamdes?.units || {};
+  // faktor: nilai_SAP × f = nilai tampilan ; si = ke SI (N, N·m, m², m²/m)
+  const dF = FORCE[Core.N(o.outF)], dL = LEN[o.outL], dA = LEN[o.outA] ** 2, avP = o.outAv.split('/'), dAv = LEN[avP[0]] ** 2 / LEN[avP[1]];
+  const FL = { kn: 'kN', n: 'N', kgf: 'kgf', tonf: 'tonf' }[Core.N(o.outF)];
+  const fU = (src) => { const si = pForce(src, o.srcF); return { f: si / dF, si, u: FL, src: src || o.srcF + '*' }; };
+  const mU = (src) => { const si = pMoment(src, o.srcF, o.srcL); return { f: si / dL / dF, si, u: FL + '·' + o.outL, src: src || o.srcF + '-' + o.srcL + '*' }; };
+  const aU = (src) => { const si = pArea(src, o.areaUnit, null); return { f: si / dA, si, u: o.outA + '²', src: src || o.areaUnit + '*' }; };
+  const vU = (src) => { const si = pArea(src, o.areaUnit, 'm'); return { f: si / dAv, si, u: avP[0] + '²/' + avP[1], src: src || o.areaUnit + '/m*' }; };
+  units = {
+    P: fU(fu.p), V: fU(fu.v2), M: mU(fu.m3), T: mU(fu.t), st: { f: pLen(fu.station, o.srcL), u: 'm' },
+    colAs: aU(cu.pmmarea), colAv: vU(cu.vmajrebar), bAs: aU(bu.ftoparea), bAv: vU(bu.vrebar), bTL: aU(bu.tlngarea), bTT: vU(bu.ttrnrebar),
+  };
+  try { localStorage.setItem('sortirSapUnits', JSON.stringify({ outF: o.outF, outL: o.outL, outA: o.outA, outAv: o.outAv, srcF: o.srcF, srcL: o.srcL, areaUnit: o.areaUnit })); } catch (_) {}
+  $('#outCard').hidden = false; $('#kpis').hidden = false; $('#emptyCard').hidden = true;
+  render();
+}
+
+/* ---- definisi baris ---- */
+const BEAM_F = [['MnT', 'Mu⁻ tumpuan (momen negatif)', 'M'], ['MpT', 'Mu⁺ tumpuan', 'M'], ['MpL', 'Mu⁺ lapangan (momen positif)', 'M'],
+  ['MnL', 'Mu⁻ lapangan', 'M'], ['VT', 'Vu tumpuan', 'V'], ['VL', 'Vu lapangan', 'V'], ['T', 'Tu (torsi) maks', 'T'], ['Pabs', 'Pu aksial maks', 'P']];
+const BEAM_D = [['TopT', 'As atas tumpuan', 'bAs', 'bar'], ['BotT', 'As bawah tumpuan', 'bAs', 'bar'], ['TopL', 'As atas lapangan', 'bAs', 'bar'],
+  ['BotL', 'As bawah lapangan', 'bAs', 'bar'], ['AvT', 'Av/s geser tumpuan', 'bAv', 'stir'], ['AvL', 'Av/s geser lapangan', 'bAv', 'stir'],
+  ['TL', 'Al torsi longitudinal', 'bTL', 'bar'], ['TT', 'At/s torsi transversal', 'bTT', '']];
+const COL_F = [['Pc', 'Pu tekan maks', 'P'], ['Pt', 'Pu minimum / tarik', 'P'], ['M3', 'Mu3 (sumbu mayor) maks', 'M'], ['M2', 'Mu2 (sumbu minor) maks', 'M'],
+  ['V2', 'Vu2 maks', 'V'], ['V3', 'Vu3 maks', 'V'], ['T', 'Tu (torsi) maks', 'T']];
+const COL_D = [['PMM', 'As longitudinal perlu (PMM)', 'colAs', 'bar'], ['Ratio', 'Rasio PMM maks', null, ''], ['VMaj', 'Av/s geser mayor', 'colAv', 'stir'], ['VMin', 'Av/s geser minor', 'colAv', 'stir']];
+
+// si: luas dalam m² (bar) atau m²/m (stir)
+function need(kind, si) {
+  const o = opts(); if (!isFinite(si) || si <= 0) return '';
+  if (kind === 'bar') { const mm = si * 1e6, a = Math.PI / 4 * o.D * o.D, n = Math.ceil(mm / a - 1e-9); return `≥ ${n} D${o.D} (${fmt(n * a, 0)} mm²)`; }
+  if (kind === 'stir') { const s = o.legs * Math.PI / 4 * o.ds * o.ds / (si * 1e3); return `Ø${o.ds} (${o.legs} kaki) s ≤ ${Math.floor(s)} mm`; }
+  return '';
+}
+function related(type, r) {
+  if (!r) return '';
+  const U = units;
+  return type === 'kolom' ? `P=${fmt(r.P * U.P.f)} · M2=${fmt(r.M2 * U.M.f)} · M3=${fmt(r.M3 * U.M.f)}` : `V2=${fmt(r.V2 * U.V.f)} · M3=${fmt(r.M3 * U.M.f)}`;
+}
+
+function visibleGroups(type) {
+  const q = st.q.toLowerCase();
+  return result.groups.filter(g => (!type || g.type === type) && (!q || g.key.toLowerCase().includes(q) || g.frameList.some(f => f.toLowerCase() === q)));
+}
+const absv = (x, c) => x ? Math.abs(x.v) * c.f : NaN;
+const dv = (x, conv) => x ? x.v * conv.f : NaN;
+
+const G_BEAM = [['', 2], ['Momen lentur', 4, 'mom'], ['Geser', 2, 'shr'], ['Torsi', 1, 'tor'], ['Tulangan longitudinal perlu', 4, 'reb'], ['Sengkang', 2, 'sti'], ['Torsi', 1, 'tor']];
+const G_COL = [['', 2], ['Pu tekan maks + momen terkait', 3, 'mom'], ['Mu3 maks', 2, 'mom'], ['Mu2 maks', 2, 'mom'], ['Geser', 2, 'shr'], ['Torsi', 1, 'tor'], ['Tulangan perlu', 2, 'reb'], ['Sengkang', 2, 'sti']];
+
+function recapData(type) {
+  const U = units, gs = visibleGroups(type);
+  const M = U.M.u, V = U.V.u, T = U.T.u, P = U.P.u;
+  if (type === 'balok') {
+    const head = [['Penampang'], ['Frame'], ['Mu⁻ tump', M], ['Mu⁺ tump', M], ['Mu⁺ lap', M], ['Mu⁻ lap', M], ['Vu tump', V], ['Vu lap', V], ['Tu', T],
+      ['As atas tump', U.bAs.u], ['As bawah tump', U.bAs.u], ['As atas lap', U.bAs.u], ['As bawah lap', U.bAs.u], ['Av/s tump', U.bAv.u], ['Av/s lap', U.bAv.u], ['Al torsi', U.bTL.u]];
+    const rows = gs.map(g => { const a = g.acc, d = g.des;
+      const neg = x => x && x.v < 0 ? Math.abs(x.v) * U.M.f : (x ? 0 : NaN), pos = x => x && x.v > 0 ? x.v * U.M.f : (x ? 0 : NaN);
+      return [g.key, g.frames.size, neg(a.MnT), pos(a.MpT), pos(a.MpL), neg(a.MnL), absv(a.VT, U.V), absv(a.VL, U.V), absv(a.T, U.T),
+        dv(d.TopT, U.bAs), dv(d.BotT, U.bAs), dv(d.TopL, U.bAs), dv(d.BotL, U.bAs), dv(d.AvT, U.bAv), dv(d.AvL, U.bAv), dv(d.TL, U.bTL)]; });
+    return { head, rows, groups: G_BEAM };
+  }
+  const head = [['Penampang'], ['Frame'], ['Pu', P], ['M3 terkait', M], ['M2 terkait', M], ['Mu3', M], ['P terkait', P],
+    ['Mu2', M], ['P terkait', P], ['Vu2', V], ['Vu3', V], ['Tu', T], ['As perlu', U.colAs.u], ['Rasio PMM', '–'], ['Av/s mayor', U.colAv.u], ['Av/s minor', U.colAv.u]];
+  const rows = gs.map(g => { const a = g.acc, d = g.des;
+    return [g.key, g.frames.size, a.Pc ? Math.abs(Math.min(a.Pc.v, 0)) * U.P.f : NaN, a.Pc ? Math.abs(a.Pc.row.M3) * U.M.f : NaN, a.Pc ? Math.abs(a.Pc.row.M2) * U.M.f : NaN,
+      absv(a.M3, U.M), a.M3 ? Math.abs(a.M3.row.P) * U.P.f : NaN, absv(a.M2, U.M), a.M2 ? Math.abs(a.M2.row.P) * U.P.f : NaN, absv(a.V2, U.V), absv(a.V3, U.V), absv(a.T, U.T),
+      dv(d.PMM, U.colAs), d.Ratio ? d.Ratio.v : NaN, dv(d.VMaj, U.colAv), dv(d.VMin, U.colAv)]; });
+  return { head, rows, groups: G_COL };
+}
+const flatHead = head => head.map(h => h[1] && h[1] !== '–' ? `${h[0]} (${h[1]})` : h[0]);
+
+function recapTable(R) {
+  const n = R.head.length, mx = [];
+  for (let i = 2; i < n; i++) { let m = -Infinity; R.rows.forEach(r => { if (isFinite(r[i]) && r[i] > m) m = r[i]; }); mx[i] = R.rows.length > 1 && m > 0 ? m : null; }
+  const gcls = []; R.groups.forEach(([, span, c]) => { for (let k = 0; k < span; k++) gcls.push(c || ''); });
+  return `<div class="tw"><table><thead>
+    <tr class="gr">${R.groups.map(([l, span, c]) => `<th colspan="${span}" class="${c ? 'g-' + c : ''}">${esc(l)}</th>`).join('')}</tr>
+    <tr>${R.head.map((h, i) => `<th class="${gcls[i] ? 'g-' + gcls[i] : ''}">${esc(h[0])}${h[1] ? `<br><small style="font-weight:500;opacity:.8">${esc(h[1])}</small>` : ''}</th>`).join('')}</tr></thead><tbody>${
+    R.rows.map(r => `<tr>${r.map((c, i) => i === 0 ? `<td class="l">${esc(c)}</td>` : i === 1 ? `<td class="dim">${c}</td>`
+      : `<td class="${mx[i] != null && c === mx[i] ? 'mx' : ''}${!isFinite(c) ? ' dim' : ''}">${fmt(c)}</td>`).join('')}</tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+function detailRows(g) {
+  const U = units, forces = [], design = [], a = g.acc, d = g.des;
+  const F = g.type === 'kolom' ? COL_F : BEAM_F, D = g.type === 'kolom' ? COL_D : BEAM_D;
+  if (result.hasForces) F.forEach(([k, lab, u]) => { const x = a[k]; if (!x) return;
+    const wrongSign = (/^Mn/.test(k) && x.v >= 0) || (/^Mp/.test(k) && x.v <= 0);
+    const v = x.v * U[u].f;
+    forces.push([lab, fmt(v), wrongSign ? '0 (tidak terjadi)' : fmt(Math.abs(v)), U[u].u, x.row.c + (x.row.st ? ' (' + x.row.st + ')' : ''), x.row.f, fmt(x.row.s * U.st.f, 2) + (g.type === 'balok' ? ' · ' + x.row.z : ''), related(g.type, x.row), '']); });
+  D.forEach(([k, lab, uk, kind]) => { const x = d[k]; if (!x) return;
+    const conv = uk ? U[uk] : { f: 1, si: 1, u: '–' }, val = x.v * conv.f;
+    design.push([lab, fmt(val), fmt(val), conv.u, x.row.c, x.row.f, fmt(x.row.s * U.st.f, 2) + (x.row.z && g.type === 'balok' ? ' · ' + x.row.z : ''), '', kind ? need(kind, x.v * conv.si) : '']); });
+  return { forces, design };
+}
+const DET_HEAD = ['Parameter', 'Nilai (bertanda)', 'Nilai desain |x|', 'Satuan', 'Kombinasi', 'Frame', 'Station (m) / zona', 'Gaya terkait', 'Perkiraan tulangan'];
+function detailTable(D) {
+  const tr = r => `<tr>${r.map((c, i) => `<td class="${i === 0 ? 'l' : i === 2 ? 'mx0' : [3, 4, 6, 7].includes(i) ? 't' : i === 8 ? 'need' : ''}"${i === 2 ? ' style="font-weight:700"' : ''}>${esc(c)}</td>`).join('')}</tr>`;
+  const sec = l => `<tr class="sec"><td colspan="${DET_HEAD.length}">${l}</td></tr>`;
+  return `<div class="tw"><table><thead><tr>${DET_HEAD.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${
+    (D.forces.length ? sec('Gaya dalam terfaktor — Element Forces') + D.forces.map(tr).join('') : '') +
+    (D.design.length ? sec('Kebutuhan tulangan — Concrete Design') + D.design.map(tr).join('') : '')}</tbody></table></div>`;
+}
+
+function kpiHTML() {
+  const U = units, B = result.groups.filter(g => g.type === 'balok'), K = result.groups.filter(g => g.type === 'kolom');
+  const best = (gs, keys) => { let r = null; gs.forEach(g => keys.forEach(k => { const x = g.acc[k]; if (x && (!r || Math.abs(x.v) > Math.abs(r.x.v))) r = { x, g }; })); return r; };
+  const card = (c, l, r, u, f) => `<div class="kpi" style="--c:${c}"><div class="l">${l}</div><div class="v">${r ? fmt(Math.abs(r.x.v) * f) : '–'}<small>${r ? esc(u) : ''}</small></div><div class="s">${r ? esc(r.g.key + ' · ' + r.x.row.c + ' · frame ' + r.x.row.f) : 'tidak ada data'}</div></div>`;
+  const frames = result.groups.reduce((s, g) => s + g.frames.size, 0), warn = result.groups.reduce((s, g) => s + g.warn, 0);
+  return `<div class="kpi" style="--c:var(--mu)"><div class="l">Penampang terbaca</div><div class="v">${B.length + K.length}<small>${B.length} balok · ${K.length} kolom</small></div><div class="s">${frames} frame · ${st.caseSel ? st.caseSel.size : 0} kombinasi ditinjau</div></div>` +
+    (result.hasForces ? card('var(--momI)', 'Mu maks balok', best(B, ['MnT', 'MpT', 'MpL', 'MnL']), U.M.u, U.M.f) + card('var(--shrI)', 'Vu maks balok', best(B, ['VT', 'VL']), U.V.u, U.V.f)
+      + card('var(--rebI)', 'Pu tekan maks kolom', best(K, ['Pc']), U.P.u, U.P.f) + card('var(--torI)', 'Mu3 maks kolom', best(K, ['M3']), U.M.u, U.M.f) : '') +
+    (result.hasCol || result.hasBeam ? `<div class="kpi" style="--c:${warn ? 'var(--wr)' : 'var(--ok)'}"><div class="l">Pesan desain SAP</div><div class="v">${warn}<small>${warn ? 'baris O/S' : 'aman'}</small></div><div class="s">${warn ? 'lihat tab Detail' : 'tidak ada overstress'}</div></div>` : '');
+}
+
+function render() {
+  const o = opts(), U = units;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === st.tab));
+  const nB = result.groups.filter(g => g.type === 'balok').length, nK = result.groups.filter(g => g.type === 'kolom').length;
+  $('#tabB').innerHTML = `Rekap Balok <span class="c">${nB}</span>`; $('#tabK').innerHTML = `Rekap Kolom <span class="c">${nK}</span>`;
+  $('#tabD').innerHTML = `Detail per ${o.groupBy === 'frame' ? 'frame' : 'penampang'} <span class="c">${result.groups.length}</span>`;
+  $('#kpis').innerHTML = kpiHTML();
+  const srcs = [result.hasForces && `${U.P.src}, ${U.M.src}`, (result.hasCol || result.hasBeam) && `${(result.hasCol ? U.colAs : U.bAs).src}, ${(result.hasCol ? U.colAv : U.bAv).src}`].filter(Boolean).join(' · ');
+  const chips = `<div class="chips">
+    <span class="chip">Satuan: <b>${esc([result.hasForces && U.P.u + ' · ' + U.M.u, (result.hasCol || result.hasBeam) && U.bAs.u + ' · ' + U.bAv.u].filter(Boolean).join(' · '))}</b></span>
+    <span class="chip">Dari SAP: <b>${esc(srcs)}</b></span>
+    ${result.hasForces ? `<span class="chip">Kombinasi: <b>${st.caseSel ? st.caseSel.size : 0}</b></span>` : ''}
+    <span class="chip">Zona tumpuan: <b>${fmt(o.region * 100, 0)}% L</b> tiap ujung</span>
+    ${/\*/.test(srcs) ? '<span class="chip w">* satuan tidak terbaca, memakai satuan sumber di pengaturan</span>' : ''}
+    ${!result.hasSect && o.groupBy === 'section' ? '<span class="chip w">Tanpa tabel Frame Section Assignments — pengelompokan memakai DesignSect</span>' : ''}
+  </div>`;
+  const signNote = `<div class="note">Rekap memakai nilai mutlak; tanda asli ada di tab Detail (SAP2000: P negatif = tekan, M3 negatif = serat atas tertarik). ▲ = nilai terbesar di kolom tersebut.</div>`;
+  if (st.tab === 'detail') {
+    const gs = visibleGroups(null);
+    $('#out').innerHTML = chips + `<div class="tools"><span class="sp"></span><button class="btn gh sm" id="dlX">⤓ Unduh Excel</button></div>` + (gs.length ? gs.map((g, i) => `
+      <div class="grp">
+        <div class="gh"><div><h3>${esc(g.key)} <span class="badge ${g.type}">${g.type}</span></h3>
+          <div class="meta">${g.section && o.groupBy === 'frame' ? 'Penampang ' + esc(g.section) + ' · ' : ''}${g.frames.size} frame: ${esc(g.frameList.slice(0, 40).join(', '))}${g.frameList.length > 40 ? ' …' : ''}</div>
+          ${g.warn ? `<div class="warn">⚠ ${g.warn} baris desain dengan pesan/overstress (frame ${esc([...g.warnFrames].slice(0, 15).join(', '))}) — periksa di SAP2000.</div>` : ''}</div>
+          <div class="gctl"><select data-ov="${esc(g.key)}" title="Tipe elemen"><option value="balok" ${g.type === 'balok' ? 'selected' : ''}>Balok</option><option value="kolom" ${g.type === 'kolom' ? 'selected' : ''}>Kolom</option></select>
+          <button class="btn gh sm" data-cp="${i}">Salin</button></div></div>
+        ${detailTable(detailRows(g))}
+      </div>`).join('') : '<p class="hint">Tidak ada data yang cocok dengan pencarian.</p>') + signNote;
+    document.querySelectorAll('[data-ov]').forEach(s => s.onchange = () => { st.override[s.dataset.ov] = s.value; compute(); });
+    document.querySelectorAll('[data-cp]').forEach(b => b.onclick = () => { const g = gs[+b.dataset.cp], D = detailRows(g); copyTSV([[g.key], DET_HEAD, ...D.forces, ...D.design], b); });
+  } else {
+    const R = recapData(st.tab);
+    $('#out').innerHTML = chips + `<div class="tools">
+        <div class="legend"><span><i style="background:var(--momI)"></i>Momen</span><span><i style="background:var(--shrI)"></i>Geser</span><span><i style="background:var(--torI)"></i>Torsi</span><span><i style="background:var(--rebI)"></i>Tulangan</span><span><i style="background:var(--stiI)"></i>Sengkang</span></div>
+        <span class="sp"></span><button class="btn sm" id="cpRecap">⧉ Salin ke Excel</button><button class="btn gh sm" id="dlX">⤓ Unduh Excel</button></div>` +
+      (R.rows.length ? recapTable(R) : `<p class="hint">Belum ada kelompok bertipe ${st.tab}. Ubah tipe elemen di tab Detail bila salah tebak.</p>`) + signNote;
+    $('#cpRecap').onclick = e => copyTSV([flatHead(R.head), ...R.rows.map(r => r.map((c, i) => typeof c === 'number' && i > 1 ? fmt(c) : c))], e.target);
+  }
+  $('#dlX').onclick = downloadXlsx;
+}
+
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2200); }
+
+async function copyTSV(rows, btn) {
+  const txt = rows.map(r => r.map(c => String(c ?? '').replace(/[\t\n]/g, ' ')).join('\t')).join('\n');
+  let ok = false;
+  try { await navigator.clipboard.writeText(txt); ok = true; }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { ok = document.execCommand('copy'); } catch (_) {}
+    ta.remove();
+  }
+  toast(ok ? '✓ Tabel tersalin — tempel (Ctrl+V) di Excel' : 'Gagal menyalin, coba lagi');
+}
+
+function downloadXlsx() {
+  if (typeof XLSX === 'undefined') { toast('Pustaka Excel belum termuat — gunakan "Salin ke Excel"'); return; }
+  const o = opts(), r = v => typeof v === 'number' ? (isFinite(v) ? +v.toFixed(o.dec) : '') : v;
+  const wb = XLSX.utils.book_new();
+  ['balok', 'kolom'].forEach(t => { const R = recapData(t); if (!R.rows.length) return;
+    const ws = XLSX.utils.aoa_to_sheet([flatHead(R.head), ...R.rows.map(row => row.map(r))]);
+    ws['!cols'] = R.head.map((_, i) => ({ wch: i === 0 ? 16 : 14 }));
+    XLSX.utils.book_append_sheet(wb, ws, 'Rekap ' + (t === 'balok' ? 'Balok' : 'Kolom')); });
+  const det = [];
+  visibleGroups(null).forEach(g => { const D = detailRows(g); det.push([g.key + ' (' + g.type + ')', 'Frame: ' + g.frameList.join(', ')], DET_HEAD, ...D.forces, ...D.design, []); });
+  if (det.length) { const ws = XLSX.utils.aoa_to_sheet(det); ws['!cols'] = DET_HEAD.map((_, i) => ({ wch: [30, 14, 14, 10, 14, 8, 18, 36, 26][i] })); XLSX.utils.book_append_sheet(wb, ws, 'Detail'); }
+  try { XLSX.writeFile(wb, 'rekap-sap2000.xlsx'); toast('⤓ Mengunduh rekap-sap2000.xlsx'); }
+  catch (e) { toast('Unduhan diblokir di mode pratinjau — gunakan "Salin ke Excel"'); }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  try { const sv = JSON.parse(localStorage.getItem('sortirSapUnits') || '{}'); for (const k in sv) if ($('#' + k)) $('#' + k).value = sv[k]; } catch (_) {}
+  document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => { const [F, L, A, Av] = b.dataset.preset.split(','); $('#outF').value = F; $('#outL').value = L; $('#outA').value = A; $('#outAv').value = Av; compute(); });
+  $('#yr').textContent = Math.max(2026, new Date().getFullYear());
+  const root = document.documentElement;
+  try { const th = localStorage.getItem('sortirSapTheme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); root.dataset.theme = th; } catch (_) {}
+  $('#themeBtn').onclick = () => { root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('sortirSapTheme', root.dataset.theme); } catch (_) {} };
+  const markPreset = () => document.querySelectorAll('[data-preset]').forEach(b => b.classList.toggle('on', b.dataset.preset === [$('#outF').value, $('#outL').value, $('#outA').value, $('#outAv').value].join(',')));
+  ['outF', 'outL', 'outA', 'outAv'].forEach(id => $('#' + id).addEventListener('change', markPreset));
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', markPreset));
+  markPreset();
+  $('#btnDemo2').onclick = loadDemo;
+  const dz = $('#drop'), fi = $('#file');
+  dz.onclick = () => fi.click();
+  fi.onchange = () => { readFiles([...fi.files]); fi.value = ''; };
+  ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('hov'); }));
+  ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('hov'); }));
+  dz.addEventListener('drop', e => readFiles([...e.dataTransfer.files]));
+  $('#btnPaste').onclick = loadPaste; $('#btnDemo').onclick = loadDemo;
+  $('#btnReset').onclick = () => { st.files = []; st.caseSel = null; st.override = {}; refresh(); };
+  ['groupBy', 'region', 'areaUnit', 'decSep', 'decimals', 'diaD', 'diaS', 'legs', 'outF', 'outL', 'outA', 'outAv', 'srcF', 'srcL'].forEach(id => $('#' + id).addEventListener('change', compute));
+  $('#search').addEventListener('input', e => { st.q = e.target.value.trim(); if (result) render(); });
+  document.querySelectorAll('.tab').forEach(t => t.onclick = () => { st.tab = t.dataset.tab; render(); });
+  $('#cAll').onclick = () => selCases('all'); $('#cComb').onclick = () => selCases('comb'); $('#cNone').onclick = () => selCases('none');
+  refresh();
+});
+
+</script>
+</body>
+</html>

@@ -24,13 +24,14 @@
       ['Statika: balok menerus', 'kalkulator/statika.html#menerus'],
       ['Statika: balok miring', 'kalkulator/statika.html#miring'],
       ['Statika: portal', 'kalkulator/statika.html#portal'],
-      ['Properti penampang', 'kalkulator/penampang.html']] },
+      ['Properti penampang', 'kalkulator/penampang.html'],
+      ['SortirSAP: rekap output SAP2000', 'kalkulator/sortir-sap/']] },
     { id: 'peraturan', t: 'Peraturan', u: 'peraturan.html' },
     { id: 'berlangganan', t: '★ Premium', u: 'berlangganan.html', cls: 'pro' }
   ];
   var SEARCH = [];
   MENU.forEach(function (m) { SEARCH.push([m.t, m.u]); (m.sub || []).forEach(function (s) { SEARCH.push(s); }); });
-  SEARCH.push(['Berlangganan Premium, harga paket', 'berlangganan.html'], ['Reaksi tumpuan, SFD, BMD', 'tutorial/balok-sederhana.html'], ['Teorema sumbu sejajar', 'tutorial/momen-inersia.html'],
+  SEARCH.push(['SAP2000 Mu Pu Vu tulangan, sortir output', 'kalkulator/sortir-sap/'], ['Berlangganan Premium, harga paket', 'berlangganan.html'], ['Reaksi tumpuan, SFD, BMD', 'tutorial/balok-sederhana.html'], ['Teorema sumbu sejajar', 'tutorial/momen-inersia.html'],
     ['Cek kontrol keseimbangan statika', 'kalkulator/statika.html'], ['Lendutan balok', 'kalkulator/balok.html'],
     ['Profil WF / I, pipa, T', 'kalkulator/penampang.html'], ['SNI beton, baja, gempa, pembebanan', 'peraturan.html']);
 
@@ -117,7 +118,7 @@
     '<div><a class="brand" href="' + root + 'index.html"><img class="brand-mark" src="' + root + 'assets/logo.svg" alt="" width="28" height="28">' +
     '<span>Sipil<span class="brand-accent">Belajar</span></span></a>' +
     '<p style="max-width:340px;margin:10px 0 0">Tutorial dan kalkulator struktur untuk mahasiswa teknik sipil. Gratis, dan semua hitungan berjalan di browser Anda.</p></div>' +
-    '<div><h4>Kalkulator</h4><ul><li><a href="' + root + 'kalkulator/balok.html">Balok</a></li><li><a href="' + root + 'kalkulator/statika.html">Statika (menerus, miring, portal)</a></li><li><a href="' + root + 'kalkulator/penampang.html">Properti penampang</a></li></ul></div>' +
+    '<div><h4>Kalkulator</h4><ul><li><a href="' + root + 'kalkulator/balok.html">Balok</a></li><li><a href="' + root + 'kalkulator/statika.html">Statika (menerus, miring, portal)</a></li><li><a href="' + root + 'kalkulator/penampang.html">Properti penampang</a></li><li><a href="' + root + 'kalkulator/sortir-sap/">SortirSAP (SAP2000)</a></li></ul></div>' +
     '<div><h4>Materi</h4><ul><li><a href="' + root + 'materi/index.html">Unduhan PDF</a></li><li><a href="' + root + 'peraturan.html">Peraturan (SNI)</a></li></ul></div>' +
     '<div><h4>Tutorial</h4><ul><li><a href="' + root + 'tutorial/balok-sederhana.html">Gaya dalam balok</a></li><li><a href="' + root + 'tutorial/momen-inersia.html">Momen inersia</a></li></ul></div>' +
     '</div><div class="footer-note">© ' + (new Date().getFullYear() > 2026 ? '2026–' + new Date().getFullYear() : '2026') + ' <b>Jauhari</b> · ' + SITE + '. Hak cipta dilindungi undang-undang.' +
