@@ -220,6 +220,19 @@
 .ssap .note{background:none;border:0;padding:0;margin:10px 0 0}
 .ssap .kpi::before{background:var(--c,var(--grad))}
 @media(min-width:1101px){.ssap aside{top:70px;max-height:calc(100vh - 84px)}}
+/* pemeriksaan data */
+.ssap .ck{border:1px solid var(--ln);border-radius:12px;padding:12px 14px;margin:0 0 12px;font-size:13px}
+.ssap .ck.ok{background:var(--okBg);border-color:color-mix(in srgb,var(--ok) 35%,transparent)}
+.ssap .ck.warn{background:var(--wrBg);border-color:color-mix(in srgb,var(--wr) 35%,transparent)}
+.ssap .ck.err{background:var(--erBg);border-color:color-mix(in srgb,var(--er) 35%,transparent)}
+.ssap .ck-h b{display:block;font-size:14px}
+.ssap .ck.ok .ck-h b{color:var(--ok)}.ssap .ck.warn .ck-h b{color:var(--wr)}.ssap .ck.err .ck-h b{color:var(--er)}
+.ssap .ck-h span{color:var(--ink);opacity:.85}
+.ssap .ck ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:5px}
+.ssap .ck li{display:flex;gap:8px;align-items:flex-start;color:var(--ink)}
+.ssap .ck li i{font-style:normal;flex:none;width:18px;text-align:center;font-weight:700}
+.ssap .ck li.warn i{color:var(--wr)}.ssap .ck li.err i{color:var(--er)}.ssap .ck li.info i{color:var(--mu)}
+.ssap .ck li.info{color:var(--mu)}
 /* indikator proses */
 .ssap .ss-busy{display:none;position:relative;overflow:hidden;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--r);background:var(--sf);border:1px solid var(--ln)}
 .ssap.is-busy .ss-busy{display:flex}
@@ -941,6 +954,58 @@ function kpiHTML() {
     (result.hasCol || result.hasBeam ? `<div class="kpi" style="--c:${warn ? 'var(--wr)' : 'var(--ok)'}"><div class="l">Pesan desain SAP</div><div class="v">${warn}<small>${warn ? 'baris O/S' : 'aman'}</small></div><div class="s">${warn ? 'lihat tab Detail' : 'tidak ada overstress'}</div></div>` : '');
 }
 
+/* ---- pemeriksaan kewajaran data ---- */
+function dataChecks() {
+  const C = [], M = model, R = result, U = units, o = opts(), n = Core.num;
+  const add = (lvl, t) => C.push({ lvl, t });
+  const names = st.files.map(f => f.name), dup = names.filter((x, i) => names.indexOf(x) !== i);
+  if (dup.length) add('warn', `File yang sama diunggah lebih dari sekali (${esc([...new Set(dup)].join(', '))}). Nilai tidak berubah, tetapi sebaiknya hapus salah satunya.`);
+  const unknown = st.files.filter(f => !f.tables.some(t => Core.typeOf(t))).map(f => f.name);
+  if (unknown.length) add('warn', `Tidak ada tabel SAP2000 yang dikenali di: ${esc(unknown.join(', '))}.`);
+  if (!M.forces) add('warn', 'Tabel <b>Element Forces - Frames</b> tidak ada, jadi Mu, Pu, Vu tidak bisa direkap. Hanya kebutuhan tulangan yang tampil.');
+  else {
+    if (st.caseSel && st.caseSel.size === 0) add('err', 'Belum ada kombinasi beban yang dicentang, jadi semua nilai gaya dalam kosong.');
+    let bad = 0; const badF = new Set();
+    M.forces.rows.forEach(r => { if (['p', 'v2', 'm3'].some(k => k in r && !isFinite(n(r[k])))) { bad++; badF.add(String(r.frame)); } });
+    if (bad) add('warn', `${bad} baris gaya dalam berisi nilai kosong atau bukan angka (frame ${esc([...badF].slice(0, 10).join(', '))}${badF.size > 10 ? ', …' : ''}). Nilai yang kosong tidak ikut dihitung.`);
+    const cases = Core.listCases(M);
+    if (cases.length && !cases.some(c => /comb/i.test(c.type))) add('info', 'Tidak ada kombinasi beban (CaseType "Combination"). Pastikan kombinasi terfaktor ikut diekspor dari SAP2000.');
+    const zero = R.groups.filter(g => Object.values(g.acc).length && Object.values(g.acc).every(x => Math.abs(x.v) < 1e-9)).map(g => g.key);
+    if (zero.length) add('warn', `Semua gaya dalam bernilai nol pada ${esc(zero.join(', '))}. Periksa apakah elemen ini terbebani.`);
+    // nilai ekstrem: cek dalam satuan SI (N, N·m)
+    let bigM = 0, bigP = 0;
+    R.groups.forEach(g => { const a = g.acc;
+      ['M3', 'M2'].forEach(k => { if (a[k] && Math.abs(a[k].v) * U.M.si > 5e7) bigM++; });
+      if (a.Pabs && Math.abs(a.Pabs.v) * U.P.si > 5e8) bigP++; });
+    if (bigM || bigP) add('warn', `Ada nilai sangat besar (${bigM ? 'momen > 50.000 kN·m' : ''}${bigM && bigP ? ', ' : ''}${bigP ? 'gaya aksial > 500.000 kN' : ''}). Biasanya ini tanda satuan sumber salah. Periksa bagian "Satuan sumber".`);
+  }
+  if (/\*/.test([U.P.src, U.M.src].join())) add('warn', 'Satuan gaya/momen tidak terbaca dari file, jadi dipakai satuan sumber di pengaturan. Pastikan sudah sesuai dengan satuan model SAP2000.');
+  if (!M.sect && o.groupBy === 'section') add('info', 'Tabel <b>Frame Section Assignments</b> tidak ada, jadi pengelompokan memakai nama DesignSect.');
+  const noSec = R.groups.find(g => g.key === '(tanpa penampang)');
+  if (noSec) add('warn', `${noSec.frames.size} frame tidak punya nama penampang (${esc(noSec.frameList.slice(0, 10).join(', '))}${noSec.frames.size > 10 ? ', …' : ''}). Sertakan tabel Frame Section Assignments.`);
+  if (!R.hasOrient) add('info', 'Tanpa tabel konektivitas, tipe balok/kolom ditebak dari nama penampang. Cek tipenya di tab Detail.');
+  if (!M.coldes && !M.beamdes) add('info', 'Tabel Concrete Design tidak ada, jadi kebutuhan tulangan tidak ditampilkan.');
+  const warnN = R.groups.reduce((s, g) => s + g.warn, 0);
+  if (warnN) add('warn', `SAP2000 memberi ${warnN} pesan desain/overstress (lihat tab Detail). Periksa penampang tersebut di model.`);
+  if (M.forces && (M.coldes || M.beamdes)) {
+    const fF = new Set(M.forces.rows.map(r => String(r.frame).trim()));
+    const dF = new Set([...(M.coldes?.rows || []), ...(M.beamdes?.rows || [])].map(r => String(r.frame).trim()));
+    const miss = [...dF].filter(f => !fF.has(f));
+    if (miss.length) add('info', `${miss.length} frame ada di tabel desain tetapi tidak ada di tabel gaya dalam (${esc(miss.slice(0, 10).join(', '))}${miss.length > 10 ? ', …' : ''}). Mungkin belum ikut dipilih saat ekspor.`);
+  }
+  const rank = { err: 0, warn: 1, info: 2 };
+  return C.sort((x, y) => rank[x.lvl] - rank[y.lvl]);
+}
+function checkHTML() {
+  const C = dataChecks(), bad = C.filter(c => c.lvl !== 'info');
+  const ic = { err: '✕', warn: '⚠', info: 'ℹ' };
+  const nB = result.groups.filter(g => g.type === 'balok').length, nK = result.groups.filter(g => g.type === 'kolom').length;
+  const head = !bad.length
+    ? `<div class="ck-h"><b>✓ Data sudah bagus</b><span>Semua pemeriksaan lolos: ${nB} penampang balok dan ${nK} kolom terbaca, satuan jelas, tidak ada nilai kosong atau janggal.</span></div>`
+    : `<div class="ck-h"><b>${C.some(c => c.lvl === 'err') ? '✕ Data belum bisa dipakai' : '⚠ Ada data yang perlu dicek'}</b><span>${bad.length} temuan. Rekap tetap ditampilkan, tetapi periksa poin berikut sebelum dipakai.</span></div>`;
+  return `<div class="ck ${C.some(c => c.lvl === 'err') ? 'err' : bad.length ? 'warn' : 'ok'}">${head}${C.length ? `<ul>${C.map(c => `<li class="${c.lvl}"><i>${ic[c.lvl]}</i><span>${c.t}</span></li>`).join('')}</ul>` : ''}</div>`;
+}
+
 function render() {
   const o = opts(), U = units;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === st.tab));
@@ -955,13 +1020,11 @@ function render() {
     <span class="chip">Dari SAP: <b>${esc(srcs)}</b></span>
     ${result.hasForces ? `<span class="chip">Kombinasi: <b>${st.caseSel ? st.caseSel.size : 0}</b></span>` : ''}
     <span class="chip">Zona tumpuan: <b>${fmt(o.region * 100, 0)}% L</b> tiap ujung</span>
-    ${/\*/.test(srcs) ? '<span class="chip w">* satuan tidak terbaca, memakai satuan sumber di pengaturan</span>' : ''}
-    ${!result.hasSect && o.groupBy === 'section' ? '<span class="chip w">Tanpa tabel Frame Section Assignments — pengelompokan memakai DesignSect</span>' : ''}
   </div>`;
   const signNote = `<div class="note">Rekap memakai nilai mutlak; tanda asli ada di tab Detail (SAP2000: P negatif = tekan, M3 negatif = serat atas tertarik). ▲ = nilai terbesar di kolom tersebut.</div>`;
   if (st.tab === 'detail') {
     const gs = visibleGroups(null);
-    $('#out').innerHTML = chips + `<div class="tools"><span class="sp"></span><button class="btn gh sm" id="dlX">⤓ Unduh Excel</button></div>` + (gs.length ? gs.map((g, i) => `
+    $('#out').innerHTML = chips + checkHTML() + `<div class="tools"><span class="sp"></span><button class="btn gh sm" id="dlX">⤓ Unduh Excel</button></div>` + (gs.length ? gs.map((g, i) => `
       <div class="grp">
         <div class="gh"><div><h3>${esc(g.key)} <span class="badge ${g.type}">${g.type}</span></h3>
           <div class="meta">${g.section && o.groupBy === 'frame' ? 'Penampang ' + esc(g.section) + ' · ' : ''}${g.frames.size} frame: ${esc(g.frameList.slice(0, 40).join(', '))}${g.frameList.length > 40 ? ' …' : ''}</div>
@@ -974,7 +1037,7 @@ function render() {
     document.querySelectorAll('[data-cp]').forEach(b => b.onclick = () => { const g = gs[+b.dataset.cp], D = detailRows(g); copyTSV([[g.key], DET_HEAD, ...D.forces, ...D.design], b); });
   } else {
     const R = recapData(st.tab);
-    $('#out').innerHTML = chips + `<div class="tools">
+    $('#out').innerHTML = chips + checkHTML() + `<div class="tools">
         <div class="legend"><span><i style="background:var(--momI)"></i>Momen</span><span><i style="background:var(--shrI)"></i>Geser</span><span><i style="background:var(--torI)"></i>Torsi</span><span><i style="background:var(--rebI)"></i>Tulangan</span><span><i style="background:var(--stiI)"></i>Sengkang</span></div>
         <span class="sp"></span><button class="btn sm" id="cpRecap">⧉ Salin ke Excel</button><button class="btn gh sm" id="dlX">⤓ Unduh Excel</button></div>` +
       (R.rows.length ? recapTable(R) : `<p class="hint">Belum ada kelompok bertipe ${st.tab}. Ubah tipe elemen di tab Detail bila salah tebak.</p>`) + signNote;
