@@ -404,10 +404,19 @@
       current = bt.dataset.case;
       $('tabs').querySelectorAll('button').forEach(function (o) { o.setAttribute('aria-selected', o === bt ? 'true' : 'false'); });
       try { history.replaceState(null, '', '#' + current); } catch (e) {}
-      renderForm(); update();
+      renderForm(); update(); gate();
     });
   });
+  // Balok menerus gratis; balok miring & portal untuk pelanggan Premium.
+  function gate() {
+    var locked = (current === 'miring' || current === 'portal') && !(window.SBPremium && SBPremium.unlocked());
+    var g = $('gate'), o = $('gate-over');
+    if (!g || !o) return;
+    g.classList.toggle('pw-locked', locked);
+    o.innerHTML = locked && window.SBPremium ? SBPremium.lockCard(current === 'portal' ? 'Kalkulator portal khusus Premium' : 'Kalkulator balok miring khusus Premium',
+      'Balok menerus tetap gratis. Berlangganan untuk membuka balok miring dan portal: reaksi, diagram N, V, M, dimensi, dan cek kontrol keseimbangan.') : '';
+  }
   var hash = (location.hash || '').slice(1);
   if (state[hash]) { current = hash; $('tabs').querySelectorAll('button').forEach(function (o) { o.setAttribute('aria-selected', o.dataset.case === hash ? 'true' : 'false'); }); }
-  renderForm(); update();
+  renderForm(); update(); gate();
 })();

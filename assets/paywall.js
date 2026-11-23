@@ -35,7 +35,13 @@
         store(h); return true;
       });
     },
-    reset: function () { try { localStorage.removeItem(KEY); } catch (e) {} }
+    reset: function () { try { localStorage.removeItem(KEY); } catch (e) {} },
+    // Kartu kunci untuk fitur kalkulator premium.
+    lockCard: function (title, text) {
+      return '<div class="pw-card pw-lock"><span class="pw-badge">★ PREMIUM</span><h3>' + title + '</h3><p>' + text + '</p>' +
+        '<div class="pw-actions"><a class="btn primary" href="' + CONFIG.checkoutUrl + '">Berlangganan</a>' +
+        '<a class="btn secondary" href="' + root + 'berlangganan.html#kode">Saya punya kode</a></div></div>';
+    }
   };
 
   var marks = document.querySelectorAll('.premium-mark');
@@ -70,7 +76,7 @@
         (titles.length ? '<ul class="pw-list">' + titles.map(function (t) { return '<li>🔒 ' + t + '</li>'; }).join('') + '</ul>' : '') +
         '<div class="pw-actions"><a class="btn primary" href="' + CONFIG.checkoutUrl + '">Berlangganan sekarang</a>' +
         '<a class="btn secondary" href="' + root + 'berlangganan.html#kode">Saya punya kode</a></div>' +
-        '<p class="pw-small">Kalkulator dan materi PDF tetap gratis.</p>' +
+        '<p class="pw-small">Kalkulator dasar dan materi PDF tetap gratis.</p>' +
       '</div>';
     m.replaceWith(box);
   });

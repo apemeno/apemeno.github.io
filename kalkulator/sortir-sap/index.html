@@ -245,6 +245,13 @@
 .ssap .man-guide th,.ssap .man-guide td{text-align:left;font-family:var(--font)}
 .ssap .man-guide td:first-child,.ssap .man-guide th:first-child{position:static}
 .ssap .mg-n{font-size:12.5px;color:var(--mu);margin:10px 0 0}
+.ssap .ss-lock{display:flex;justify-content:center;margin:6px 0 14px}
+.ssap .ss-lock .pw-card{max-width:520px;width:100%}
+.ssap .ss-lock .pw-card h3{font-family:var(--font-display)}
+.ssap .ss-lock .btn{background:initial}
+.ssap .ss-lock .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.ssap .ss-lock .btn.secondary{background:var(--sf);color:var(--ink);border:1px solid var(--ln2)}
+.ssap .pro-mark{color:#ff8a3d;font-weight:800}
 /* indikator proses */
 .ssap .ss-busy{display:none;position:relative;overflow:hidden;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--r);background:var(--sf);border:1px solid var(--ln)}
 .ssap.is-busy .ss-busy{display:flex}
@@ -400,6 +407,7 @@
 </div>
 </main>
 <script src="../../assets/layout.js"></script>
+<script src="../../assets/paywall.js"></script>
 <script>
 /* SortirSAP © 2026 Jauhari — https://sipilbelajar.netlify.app */
 /* ===== CORE: parsing & analisis output SAP2000 ===== */
@@ -1062,6 +1070,13 @@ function render() {
     <span class="chip">Zona tumpuan: <b>${fmt(o.region * 100, 0)}% L</b> tiap ujung</span>
   </div>`;
   const signNote = `<div class="note">Rekap memakai nilai mutlak; tanda asli ada di tab Detail (SAP2000: P negatif = tekan, M3 negatif = serat atas tertarik). ▲ = nilai terbesar di kolom tersebut.</div>`;
+  const locked = !(window.SBPremium && SBPremium.unlocked());
+  if (locked) $('#tabD').innerHTML += ' <span class="pro-mark" title="Premium">★</span>';
+  const lockMsg = () => SBPremium.lockCard('Fitur Premium', 'Rekap balok & kolom, pemeriksaan data, dan panduan hitungan manual tetap gratis. Berlangganan untuk membuka <b>tab Detail</b> (kombinasi, frame, station, gaya terkait, perkiraan tulangan) serta <b>Salin & Unduh Excel</b>.');
+  if (st.tab === 'detail' && locked) {
+    $('#out').innerHTML = chips + checkHTML() + '<div class="ss-lock">' + lockMsg() + '</div>';
+    return;
+  }
   if (st.tab === 'detail') {
     const gs = visibleGroups(null);
     $('#out').innerHTML = chips + checkHTML() + `<div class="tools"><span class="sp"></span><button class="btn gh sm" id="dlX">⤓ Unduh Excel</button></div>` + (gs.length ? gs.map((g, i) => `
@@ -1079,11 +1094,15 @@ function render() {
     const R = recapData(st.tab);
     $('#out').innerHTML = chips + checkHTML() + `<div class="tools">
         <div class="legend"><span><i style="background:var(--momI)"></i>Momen</span><span><i style="background:var(--shrI)"></i>Geser</span><span><i style="background:var(--torI)"></i>Torsi</span><span><i style="background:var(--rebI)"></i>Tulangan</span><span><i style="background:var(--stiI)"></i>Sengkang</span><span><b class="star">★</b> dipakai untuk hitungan manual</span></div>
-        <span class="sp"></span><button class="btn sm" id="cpRecap">⧉ Salin ke Excel</button><button class="btn gh sm" id="dlX">⤓ Unduh Excel</button></div>` +
+        <span class="sp"></span><button class="btn sm" id="cpRecap">${locked ? '★ ' : '⧉ '}Salin ke Excel</button><button class="btn gh sm" id="dlX">${locked ? '★ ' : '⤓ '}Unduh Excel</button></div><div id="lockSpot"></div>` +
       (R.rows.length ? recapTable(R) : `<p class="hint">Belum ada kelompok bertipe ${st.tab}. Ubah tipe elemen di tab Detail bila salah tebak.</p>`) + (R.rows.length ? guideHTML(st.tab) : '') + signNote;
     $('#cpRecap').onclick = e => copyTSV([flatHead(R.head), ...R.rows.map(r => r.map((c, i) => typeof c === 'number' && i > 1 ? fmt(c) : c))], e.target);
   }
   $('#dlX').onclick = downloadXlsx;
+  if (locked) {
+    const show = () => { $('#lockSpot').innerHTML = '<div class="ss-lock">' + lockMsg() + '</div>'; $('#lockSpot').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
+    $('#dlX').onclick = show; if ($('#cpRecap')) $('#cpRecap').onclick = show;
+  }
 }
 
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2200); }

@@ -42,11 +42,12 @@
 
   <div class="case-tabs" role="tablist" id="tabs">
     <button role="tab" data-case="menerus" aria-selected="true">Balok menerus</button>
-    <button role="tab" data-case="miring" aria-selected="false">Balok miring</button>
-    <button role="tab" data-case="portal" aria-selected="false">Portal</button>
+    <button role="tab" data-case="miring" aria-selected="false">Balok miring <span class="pro-mark" title="Premium">★</span></button>
+    <button role="tab" data-case="portal" aria-selected="false">Portal <span class="pro-mark" title="Premium">★</span></button>
   </div>
 
-  <div class="calc">
+  <div class="calc pw-gate" id="gate">
+    <div class="pw-over" id="gate-over"></div>
     <form id="form" autocomplete="off" onsubmit="return false"></form>
     <section aria-live="polite">
       <div class="results" id="results"></div>
@@ -69,6 +70,7 @@
 <script src="../assets/frame.js"></script>
 <script src="../assets/statika-cases.js"></script>
 <script src="../assets/katex/katex.min.js"></script>
+<script src="../assets/paywall.js"></script>
 <script src="../assets/statika.js"></script>
 </body>
 </html>
