@@ -233,6 +233,18 @@
 .ssap .ck li i{font-style:normal;flex:none;width:18px;text-align:center;font-weight:700}
 .ssap .ck li.warn i{color:var(--wr)}.ssap .ck li.err i{color:var(--er)}.ssap .ck li.info i{color:var(--mu)}
 .ssap .ck li.info{color:var(--mu)}
+/* penanda hitungan manual */
+.ssap .star{color:#ff8a3d;font-weight:800;margin-right:3px}
+.ssap th.man{box-shadow:inset 0 -3px 0 #ff8a3d}
+.ssap td.man{background:color-mix(in srgb,#ff8a3d 7%,transparent);font-weight:600}
+.ssap tbody tr:hover td.man{background:var(--pr2)}
+.ssap .man-guide{margin-top:14px;border:1px solid color-mix(in srgb,#ff8a3d 40%,var(--ln));border-radius:12px;padding:12px 14px;background:color-mix(in srgb,#ff8a3d 5%,var(--sf))}
+.ssap .mg-h{font-size:13px;margin-bottom:10px;color:var(--ink)}
+.ssap .man-b{display:inline-block;background:var(--grad);color:#0f1216;font-weight:700;font-size:12px;padding:3px 10px;border-radius:99px;margin-right:6px}
+.ssap .man-guide table{font-size:12.5px}
+.ssap .man-guide th,.ssap .man-guide td{text-align:left;font-family:var(--font)}
+.ssap .man-guide td:first-child,.ssap .man-guide th:first-child{position:static}
+.ssap .mg-n{font-size:12.5px;color:var(--mu);margin:10px 0 0}
 /* indikator proses */
 .ssap .ss-busy{display:none;position:relative;overflow:hidden;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--r);background:var(--sf);border:1px solid var(--ln)}
 .ssap.is-busy .ss-busy{display:flex}
@@ -898,7 +910,7 @@ function recapData(type) {
       const neg = x => x && x.v < 0 ? Math.abs(x.v) * U.M.f : (x ? 0 : NaN), pos = x => x && x.v > 0 ? x.v * U.M.f : (x ? 0 : NaN);
       return [g.key, g.frames.size, neg(a.MnT), pos(a.MpT), pos(a.MpL), neg(a.MnL), absv(a.VT, U.V), absv(a.VL, U.V), absv(a.T, U.T),
         dv(d.TopT, U.bAs), dv(d.BotT, U.bAs), dv(d.TopL, U.bAs), dv(d.BotL, U.bAs), dv(d.AvT, U.bAv), dv(d.AvL, U.bAv), dv(d.TL, U.bTL)]; });
-    return { head, rows, groups: G_BEAM };
+    return { head, rows, groups: G_BEAM, man: head.map(h => MAN_HEAD.balok.includes(h[0])) };
   }
   const head = [['Penampang'], ['Frame'], ['Pu', P], ['M3 terkait', M], ['M2 terkait', M], ['Mu3', M], ['P terkait', P],
     ['Mu2', M], ['P terkait', P], ['Vu2', V], ['Vu3', V], ['Tu', T], ['As perlu', U.colAs.u], ['Rasio PMM', '–'], ['Av/s mayor', U.colAv.u], ['Av/s minor', U.colAv.u]];
@@ -906,9 +918,37 @@ function recapData(type) {
     return [g.key, g.frames.size, a.Pc ? Math.abs(Math.min(a.Pc.v, 0)) * U.P.f : NaN, a.Pc ? Math.abs(a.Pc.row.M3) * U.M.f : NaN, a.Pc ? Math.abs(a.Pc.row.M2) * U.M.f : NaN,
       absv(a.M3, U.M), a.M3 ? Math.abs(a.M3.row.P) * U.P.f : NaN, absv(a.M2, U.M), a.M2 ? Math.abs(a.M2.row.P) * U.P.f : NaN, absv(a.V2, U.V), absv(a.V3, U.V), absv(a.T, U.T),
       dv(d.PMM, U.colAs), d.Ratio ? d.Ratio.v : NaN, dv(d.VMaj, U.colAv), dv(d.VMin, U.colAv)]; });
-  return { head, rows, groups: G_COL };
+  return { head, rows, groups: G_COL, man: head.map(h => MAN_HEAD.kolom.includes(h[0])) };
 }
 const flatHead = head => head.map(h => h[1] && h[1] !== '–' ? `${h[0]} (${h[1]})` : h[0]);
+
+/* ---- nilai yang dipakai untuk hitungan manual ---- */
+const MAN_HEAD = { balok: ['Mu⁻ tump', 'Mu⁺ lap', 'Vu tump', 'Vu lap', 'Tu'], kolom: ['Pu', 'M3 terkait', 'M2 terkait', 'Mu3', 'Mu2', 'P terkait', 'Vu2', 'Vu3', 'Tu'] };
+const MAN_KEY = { balok: ['MnT', 'MpL', 'VT', 'VL', 'T'], kolom: ['Pc', 'M3', 'M2', 'V2', 'V3', 'T'] };
+const GUIDE = {
+  balok: [
+    ['Mu⁻ tumpuan', 'Tulangan <b>atas</b> di daerah tumpuan (momen negatif).', 'φMn ≥ Mu, φ = 0,9 → As perlu'],
+    ['Mu⁺ lapangan', 'Tulangan <b>bawah</b> di tengah bentang (momen positif).', 'φMn ≥ Mu, φ = 0,9 → As perlu'],
+    ['Vu tumpuan', 'Sengkang <b>rapat</b> di daerah tumpuan.', 'φ(Vc + Vs) ≥ Vu, φ = 0,75 → Av/s'],
+    ['Vu lapangan', 'Sengkang di daerah lapangan (jarak lebih renggang).', 'φ(Vc + Vs) ≥ Vu, φ = 0,75 → Av/s'],
+    ['Tu', 'Cek perlu tulangan torsi. Abaikan bila Tu di bawah ambang torsi SNI 2847:2019.', 'Tu < φ·0,083λ√fc′·(Acp²/pcp)'],
+  ],
+  balokNote: 'Mu⁺ tumpuan dan Mu⁻ lapangan umumnya kecil; cukup untuk cek tulangan minimum. Kolom As dan Av/s dari SAP2000 dipakai sebagai <b>pembanding</b> hasil hitungan manual Anda.',
+  kolom: [
+    ['Pu + M3, M2 terkait', 'Titik 1 diagram interaksi: kondisi aksial tekan terbesar.', 'Plot (Pu, Mu) harus di dalam kurva φPn–φMn'],
+    ['Mu3 + P terkait', 'Titik 2 diagram interaksi: momen sumbu mayor terbesar.', 'Plot (P, Mu3) di dalam kurva'],
+    ['Mu2 + P terkait', 'Titik 3 diagram interaksi: momen sumbu minor terbesar (biaksial).', 'Plot (P, Mu2) di dalam kurva'],
+    ['Vu2, Vu3', 'Sengkang/tulangan geser kolom tiap arah.', 'φ(Vc + Vs) ≥ Vu, φ = 0,75'],
+    ['Tu', 'Cek torsi kolom (biasanya kecil).', 'Tu < ambang torsi → abaikan'],
+  ],
+  kolomNote: 'Gunakan nilai Pu dan momen <b>berpasangan</b> dari kombinasi yang sama, jangan memasangkan Pu maks dengan Mu maks dari kombinasi berbeda. As perlu dan rasio PMM dari SAP2000 adalah <b>pembanding</b>.',
+};
+function guideHTML(type) {
+  return `<div class="man-guide"><div class="mg-h"><span class="man-b">★ Untuk hitungan manual</span> Kolom bertanda ★ di tabel adalah nilai yang dipakai sebagai data perhitungan manual (SNI 2847:2019):</div>
+    <div class="tw" style="max-height:none"><table><thead><tr><th>Nilai</th><th>Dipakai untuk</th><th>Kontrol</th></tr></thead><tbody>
+    ${GUIDE[type].map(r => `<tr><td class="l">★ ${r[0]}</td><td class="t" style="white-space:normal">${r[1]}</td><td class="t" style="white-space:normal">${r[2]}</td></tr>`).join('')}
+    </tbody></table></div><p class="mg-n">${GUIDE[type + 'Note']}</p></div>`;
+}
 
 function recapTable(R) {
   const n = R.head.length, mx = [];
@@ -916,9 +956,9 @@ function recapTable(R) {
   const gcls = []; R.groups.forEach(([, span, c]) => { for (let k = 0; k < span; k++) gcls.push(c || ''); });
   return `<div class="tw"><table><thead>
     <tr class="gr">${R.groups.map(([l, span, c]) => `<th colspan="${span}" class="${c ? 'g-' + c : ''}">${esc(l)}</th>`).join('')}</tr>
-    <tr>${R.head.map((h, i) => `<th class="${gcls[i] ? 'g-' + gcls[i] : ''}">${esc(h[0])}${h[1] ? `<br><small style="font-weight:500;opacity:.8">${esc(h[1])}</small>` : ''}</th>`).join('')}</tr></thead><tbody>${
+    <tr>${R.head.map((h, i) => `<th class="${gcls[i] ? 'g-' + gcls[i] : ''}${R.man && R.man[i] ? ' man' : ''}">${R.man && R.man[i] ? '<span class="star" title="Dipakai untuk hitungan manual">★</span>' : ''}${esc(h[0])}${h[1] ? `<br><small style="font-weight:500;opacity:.8">${esc(h[1])}</small>` : ''}</th>`).join('')}</tr></thead><tbody>${
     R.rows.map(r => `<tr>${r.map((c, i) => i === 0 ? `<td class="l">${esc(c)}</td>` : i === 1 ? `<td class="dim">${c}</td>`
-      : `<td class="${mx[i] != null && c === mx[i] ? 'mx' : ''}${!isFinite(c) ? ' dim' : ''}">${fmt(c)}</td>`).join('')}</tr>`).join('')}
+      : `<td class="${mx[i] != null && c === mx[i] ? 'mx' : ''}${!isFinite(c) ? ' dim' : ''}${R.man && R.man[i] ? ' man' : ''}">${fmt(c)}</td>`).join('')}</tr>`).join('')}
   </tbody></table></div>`;
 }
 
@@ -928,7 +968,7 @@ function detailRows(g) {
   if (result.hasForces) F.forEach(([k, lab, u]) => { const x = a[k]; if (!x) return;
     const wrongSign = (/^Mn/.test(k) && x.v >= 0) || (/^Mp/.test(k) && x.v <= 0);
     const v = x.v * U[u].f;
-    forces.push([lab, fmt(v), wrongSign ? '0 (tidak terjadi)' : fmt(Math.abs(v)), U[u].u, x.row.c + (x.row.st ? ' (' + x.row.st + ')' : ''), x.row.f, fmt(x.row.s * U.st.f, 2) + (g.type === 'balok' ? ' · ' + x.row.z : ''), related(g.type, x.row), '']); });
+    forces.push([(MAN_KEY[g.type].includes(k) ? '★ ' : '') + lab, fmt(v), wrongSign ? '0 (tidak terjadi)' : fmt(Math.abs(v)), U[u].u, x.row.c + (x.row.st ? ' (' + x.row.st + ')' : ''), x.row.f, fmt(x.row.s * U.st.f, 2) + (g.type === 'balok' ? ' · ' + x.row.z : ''), related(g.type, x.row), '']); });
   D.forEach(([k, lab, uk, kind]) => { const x = d[k]; if (!x) return;
     const conv = uk ? U[uk] : { f: 1, si: 1, u: '–' }, val = x.v * conv.f;
     design.push([lab, fmt(val), fmt(val), conv.u, x.row.c, x.row.f, fmt(x.row.s * U.st.f, 2) + (x.row.z && g.type === 'balok' ? ' · ' + x.row.z : ''), '', kind ? need(kind, x.v * conv.si) : '']); });
@@ -1032,15 +1072,15 @@ function render() {
           <div class="gctl"><select data-ov="${esc(g.key)}" title="Tipe elemen"><option value="balok" ${g.type === 'balok' ? 'selected' : ''}>Balok</option><option value="kolom" ${g.type === 'kolom' ? 'selected' : ''}>Kolom</option></select>
           <button class="btn gh sm" data-cp="${i}">Salin</button></div></div>
         ${detailTable(detailRows(g))}
-      </div>`).join('') : '<p class="hint">Tidak ada data yang cocok dengan pencarian.</p>') + signNote;
+      </div>`).join('') : '<p class="hint">Tidak ada data yang cocok dengan pencarian.</p>') + '<div class="note"><b class="star">★</b> = nilai yang dipakai untuk hitungan manual. Baris tulangan dari Concrete Design adalah pembanding.</div>' + signNote;
     document.querySelectorAll('[data-ov]').forEach(s => s.onchange = () => { st.override[s.dataset.ov] = s.value; compute(); });
     document.querySelectorAll('[data-cp]').forEach(b => b.onclick = () => { const g = gs[+b.dataset.cp], D = detailRows(g); copyTSV([[g.key], DET_HEAD, ...D.forces, ...D.design], b); });
   } else {
     const R = recapData(st.tab);
     $('#out').innerHTML = chips + checkHTML() + `<div class="tools">
-        <div class="legend"><span><i style="background:var(--momI)"></i>Momen</span><span><i style="background:var(--shrI)"></i>Geser</span><span><i style="background:var(--torI)"></i>Torsi</span><span><i style="background:var(--rebI)"></i>Tulangan</span><span><i style="background:var(--stiI)"></i>Sengkang</span></div>
+        <div class="legend"><span><i style="background:var(--momI)"></i>Momen</span><span><i style="background:var(--shrI)"></i>Geser</span><span><i style="background:var(--torI)"></i>Torsi</span><span><i style="background:var(--rebI)"></i>Tulangan</span><span><i style="background:var(--stiI)"></i>Sengkang</span><span><b class="star">★</b> dipakai untuk hitungan manual</span></div>
         <span class="sp"></span><button class="btn sm" id="cpRecap">⧉ Salin ke Excel</button><button class="btn gh sm" id="dlX">⤓ Unduh Excel</button></div>` +
-      (R.rows.length ? recapTable(R) : `<p class="hint">Belum ada kelompok bertipe ${st.tab}. Ubah tipe elemen di tab Detail bila salah tebak.</p>`) + signNote;
+      (R.rows.length ? recapTable(R) : `<p class="hint">Belum ada kelompok bertipe ${st.tab}. Ubah tipe elemen di tab Detail bila salah tebak.</p>`) + (R.rows.length ? guideHTML(st.tab) : '') + signNote;
     $('#cpRecap').onclick = e => copyTSV([flatHead(R.head), ...R.rows.map(r => r.map((c, i) => typeof c === 'number' && i > 1 ? fmt(c) : c))], e.target);
   }
   $('#dlX').onclick = downloadXlsx;
