@@ -750,6 +750,7 @@ async function readFiles(fileList) {
   busyOn('Membaca ' + fileList.length + ' file SAP2000…'); await tick();
   try {
   for (const file of fileList) {
+    $('#busyMsg').textContent = 'Membaca ' + file.name + '…'; await tick();
     try {
       const ext = file.name.split('.').pop().toLowerCase();
       let tables = [];
@@ -781,19 +782,20 @@ function loadDemo() {
 }
 
 let model = null, result = null, units = {};
+function usedFiles() { return st.files.filter(f => f.tables.some(t => Core.typeOf(t))).map(f => f.name); }
 function refresh() {
   const all = st.files.flatMap(f => f.tables);
   const { M, info } = Core.buildModel(all); model = M;
   // daftar file & tabel terdeteksi
   $('#fileList').innerHTML = st.files.map((f, i) => `
-    <div class="file"><div class="fh"><span>${esc(f.name)}</span><button class="x" data-rm="${i}" title="Hapus file">✕</button></div>
+    <div class="file"><div class="fh"><span>📄 ${esc(f.name)}</span><button class="x" data-rm="${i}" title="Hapus file">✕</button></div>
       ${f.tables.length ? f.tables.map(t => { const ty = Core.typeOf(t); return `<div class="tb ${ty ? 'ok' : 'skip'}"><i class="d"></i><div>${esc(ty ? Core.TYPE_LABEL[ty] : (t.name || '(tanpa nama)'))} <span>· ${t.rows.length.toLocaleString('id-ID')} baris${ty ? '' : ' · tidak dipakai'}</span></div></div>`; }).join('')
       : '<div class="tb skip"><i class="d"></i>Tidak ada tabel SAP2000 yang dikenali.</div>'}
     </div>`).join('');
   document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { st.files.splice(+b.dataset.rm, 1); refresh(); });
   if (!st.files.length) setStatus('');
   else if (!M.forces && !M.coldes && !M.beamdes) setStatus('Tabel gaya dalam / desain beton belum ditemukan. Pastikan tabel "Element Forces - Frames" atau "Concrete Design" ikut diekspor.', 'err');
-  else setStatus('✓ Data siap: ' + [M.forces && 'gaya dalam', M.coldes && 'desain kolom', M.beamdes && 'desain balok', M.sect && 'penampang', M.conn && 'konektivitas'].filter(Boolean).join(', ') + ' terbaca.', 'ok');
+  else setStatus('✓ Data siap dari ' + usedFiles().length + ' file (' + usedFiles().join(', ') + '): ' + [M.forces && 'gaya dalam', M.coldes && 'desain kolom', M.beamdes && 'desain balok', M.sect && 'penampang', M.conn && 'konektivitas'].filter(Boolean).join(', ') + ' terbaca.', 'ok');
   renderCases(); compute();
 }
 
@@ -948,6 +950,7 @@ function render() {
   $('#kpis').innerHTML = kpiHTML();
   const srcs = [result.hasForces && `${U.P.src}, ${U.M.src}`, (result.hasCol || result.hasBeam) && `${(result.hasCol ? U.colAs : U.bAs).src}, ${(result.hasCol ? U.colAv : U.bAv).src}`].filter(Boolean).join(' · ');
   const chips = `<div class="chips">
+    <span class="chip">📄 File terbaca: <b>${esc(usedFiles().join(', ') || '–')}</b></span>
     <span class="chip">Satuan: <b>${esc([result.hasForces && U.P.u + ' · ' + U.M.u, (result.hasCol || result.hasBeam) && U.bAs.u + ' · ' + U.bAv.u].filter(Boolean).join(' · '))}</b></span>
     <span class="chip">Dari SAP: <b>${esc(srcs)}</b></span>
     ${result.hasForces ? `<span class="chip">Kombinasi: <b>${st.caseSel ? st.caseSel.size : 0}</b></span>` : ''}
@@ -1005,6 +1008,8 @@ function downloadXlsx() {
   const det = [];
   visibleGroups(null).forEach(g => { const D = detailRows(g); det.push([g.key + ' (' + g.type + ')', 'Frame: ' + g.frameList.join(', ')], DET_HEAD, ...D.forces, ...D.design, []); });
   if (det.length) { const ws = XLSX.utils.aoa_to_sheet(det); ws['!cols'] = DET_HEAD.map((_, i) => ({ wch: [30, 14, 14, 10, 14, 8, 18, 36, 26][i] })); XLSX.utils.book_append_sheet(wb, ws, 'Detail'); }
+  const src = XLSX.utils.aoa_to_sheet([['File sumber', 'Tabel terbaca'], ...st.files.map(f => [f.name, f.tables.filter(t => Core.typeOf(t)).map(t => Core.TYPE_LABEL[Core.typeOf(t)]).join('; ') || 'tidak dikenali'])]);
+  src['!cols'] = [{ wch: 36 }, { wch: 90 }]; XLSX.utils.book_append_sheet(wb, src, 'Sumber data');
   try { XLSX.writeFile(wb, 'rekap-sap2000.xlsx'); toast('⤓ Mengunduh rekap-sap2000.xlsx'); }
   catch (e) { toast('Unduhan diblokir di mode pratinjau — gunakan "Salin ke Excel"'); }
 }
