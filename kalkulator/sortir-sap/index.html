@@ -220,6 +220,20 @@
 .ssap .note{background:none;border:0;padding:0;margin:10px 0 0}
 .ssap .kpi::before{background:var(--c,var(--grad))}
 @media(min-width:1101px){.ssap aside{top:70px;max-height:calc(100vh - 84px)}}
+/* indikator proses */
+.ssap .ss-busy{display:none;position:relative;overflow:hidden;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--r);background:var(--sf);border:1px solid var(--ln)}
+.ssap.is-busy .ss-busy{display:flex}
+.ssap .ss-busy b{display:block;font-size:15px}
+.ssap .ss-busy span{color:var(--mu);font-size:13px}
+.ssap .ss-spin{flex:none;width:28px;height:28px;border-radius:50%;border:3px solid var(--ln);border-top-color:#ff8a3d;border-right-color:#22d3ee;animation:ss-spin .8s linear infinite}
+.ssap .ss-busy::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:40%;background:var(--grad);animation:ss-bar 1.1s ease-in-out infinite}
+@keyframes ss-spin{to{transform:rotate(360deg)}}
+@keyframes ss-bar{0%{left:-40%}100%{left:100%}}
+.ssap.is-busy #kpis,.ssap.is-busy #outCard,.ssap.is-busy #emptyCard{opacity:.35;pointer-events:none;transition:opacity .15s}
+.ssap.is-busy aside{pointer-events:none}
+.ssap.is-busy aside .card{opacity:.75}
+.ssap .status .ss-spin{width:14px;height:14px;border-width:2px}
+@media (prefers-reduced-motion: reduce){.ssap .ss-spin,.ssap .ss-busy::after{animation-duration:2.4s}}
 </style>
 </head>
 <body data-root="../../" data-page="sortirsap">
@@ -326,6 +340,7 @@
   </aside>
 
   <div class="ss-main">
+    <div class="ss-busy" role="status" aria-live="polite"><i class="ss-spin" aria-hidden="true"></i><div><b>Memproses… mohon tunggu</b><span id="busyMsg">Menyortir data</span></div></div>
     <div id="kpis" class="kpis" hidden></div>
     <section class="card" id="outCard" hidden>
       <div class="rhead">
@@ -711,7 +726,29 @@ function pArea(u, fbArea, perFb) {
 
 function setStatus(msg, kind) { const el = $('#status'); el.textContent = msg; el.className = 'status ' + (kind || ''); }
 
+/* ---- indikator proses (loading) ---- */
+let busyN = 0, busyT0 = 0;
+const tick = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 30)));
+function busyOn(msg) {
+  $('#busyMsg').textContent = msg;
+  if (busyN++ === 0) {
+    busyT0 = performance.now();
+    $('.ssap').classList.add('is-busy');
+    document.querySelectorAll('.ssap button, .ssap input, .ssap select, .ssap textarea').forEach(el => { if (!el.disabled) { el.disabled = true; el.dataset.busyOff = '1'; } });
+  }
+}
+async function busyOff() {
+  const wait = 500 - (performance.now() - busyT0);
+  if (wait > 0) await new Promise(r => setTimeout(r, wait));
+  if (--busyN > 0) return;
+  busyN = 0;
+  $('.ssap').classList.remove('is-busy');
+  document.querySelectorAll('[data-busy-off]').forEach(el => { el.disabled = false; delete el.dataset.busyOff; });
+}
+
 async function readFiles(fileList) {
+  busyOn('Membaca ' + fileList.length + ' file SAP2000…'); await tick();
+  try {
   for (const file of fileList) {
     try {
       const ext = file.name.split('.').pop().toLowerCase();
@@ -730,6 +767,7 @@ async function readFiles(fileList) {
     } catch (e) { setStatus('Gagal membaca ' + file.name + ': ' + e.message, 'err'); }
   }
   refresh();
+  } finally { busyOff(); }
 }
 
 function loadPaste() {
@@ -776,7 +814,11 @@ function selCases(mode) {
   renderCases(); compute();
 }
 
-function compute() {
+async function compute() {
+  busyOn('Menyortir nilai Mu, Pu, Vu & tulangan maksimum…'); await tick();
+  try { computeNow(); } finally { await busyOff(); }
+}
+function computeNow() {
   if (!model || (!model.forces && !model.coldes && !model.beamdes)) { $('#out').innerHTML = ''; $('#outCard').hidden = true; $('#kpis').hidden = true; $('#emptyCard').hidden = false; return; }
   const o = opts();
   result = Core.analyze(model, { groupBy: o.groupBy, region: o.region, cases: model.forces ? st.caseSel : null, override: st.override });
