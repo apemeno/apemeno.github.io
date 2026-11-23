@@ -120,7 +120,7 @@
     '<div><h4>Kalkulator</h4><ul><li><a href="' + root + 'kalkulator/balok.html">Balok</a></li><li><a href="' + root + 'kalkulator/statika.html">Statika (menerus, miring, portal)</a></li><li><a href="' + root + 'kalkulator/penampang.html">Properti penampang</a></li></ul></div>' +
     '<div><h4>Materi</h4><ul><li><a href="' + root + 'materi/index.html">Unduhan PDF</a></li><li><a href="' + root + 'peraturan.html">Peraturan (SNI)</a></li></ul></div>' +
     '<div><h4>Tutorial</h4><ul><li><a href="' + root + 'tutorial/balok-sederhana.html">Gaya dalam balok</a></li><li><a href="' + root + 'tutorial/momen-inersia.html">Momen inersia</a></li></ul></div>' +
-    '</div><div class="footer-note">© ' + new Date().getFullYear() + ' ' + SITE +
-    ' · Untuk belajar. Selalu periksa ulang hasil perhitungan sebelum dipakai untuk desain nyata.</div></div>';
+    '</div><div class="footer-note">© ' + (new Date().getFullYear() > 2026 ? '2026–' + new Date().getFullYear() : '2026') + ' <b>Jauhari</b> · ' + SITE + '. Hak cipta dilindungi undang-undang.' +
+    ' Untuk belajar. Selalu periksa ulang hasil perhitungan sebelum dipakai untuk desain nyata.</div></div>';
   document.body.appendChild(footer);
 })();
